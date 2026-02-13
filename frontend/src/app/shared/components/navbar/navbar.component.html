@@ -1,0 +1,59 @@
+<mat-toolbar color="primary" class="shadow-md">
+    <div class="container mx-auto flex items-center justify-between px-4">
+      <!-- Logo et titre -->
+      <div class="flex items-center space-x-2 cursor-pointer" (click)="navigateTo('/')">
+        <mat-icon>home</mat-icon>
+        <span class="text-xl font-bold">Annonces Logement</span>
+      </div>
+  
+      <!-- Navigation -->
+      <nav class="hidden md:flex space-x-4">
+        <button mat-button (click)="navigateTo('/')">
+          <mat-icon>search</mat-icon>
+          Annonces
+        </button>
+        
+        <button mat-button (click)="navigateTo('/annonces/create')" *ngIf="isAuthenticated">
+          <mat-icon>add_circle</mat-icon>
+          Publier
+        </button>
+      </nav>
+  
+      <!-- Actions utilisateur -->
+      <div class="flex items-center space-x-2">
+        <ng-container *ngIf="!isAuthenticated">
+          <button mat-button (click)="navigateTo('/auth/login')">
+            Connexion
+          </button>
+          <button mat-raised-button color="accent" (click)="navigateTo('/auth/register')">
+            Inscription
+          </button>
+        </ng-container>
+  
+        <ng-container *ngIf="isAuthenticated">
+          <button mat-icon-button [matMenuTriggerFor]="userMenu">
+            <mat-icon>account_circle</mat-icon>
+          </button>
+          <mat-menu #userMenu="matMenu">
+            <button mat-menu-item (click)="navigateTo('/profile')">
+              <mat-icon>person</mat-icon>
+              <span>Mon Profil</span>
+            </button>
+            <button mat-menu-item (click)="navigateTo('/annonces/mes-annonces')">
+              <mat-icon>list</mat-icon>
+              <span>Mes Annonces</span>
+            </button>
+            <button mat-menu-item (click)="navigateTo('/messages')">
+              <mat-icon matBadge="3" matBadgeColor="warn">mail</mat-icon>
+              <span>Messages</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Déconnexion</span>
+            </button>
+          </mat-menu>
+        </ng-container>
+      </div>
+    </div>
+  </mat-toolbar>
