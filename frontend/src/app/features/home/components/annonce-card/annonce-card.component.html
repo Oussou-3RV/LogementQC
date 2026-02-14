@@ -1,1 +1,52 @@
-<p>annonce-card works!</p>
+<mat-card class="h-full hover:shadow-xl transition-shadow duration-300 cursor-pointer" 
+          (click)="viewDetails()">
+  <!-- Image -->
+  <div class="relative h-48 overflow-hidden">
+    <img 
+      [src]="getMainPhoto()" 
+      [alt]="annonce.titre"
+      class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+    />
+    <div class="absolute top-2 right-2">
+      <mat-chip class="bg-white shadow-md">
+        {{ annonce.montantMensuel | currency: 'CAD':'symbol':'1.0-0' }}/mois
+      </mat-chip>
+    </div>
+  </div>
+
+  <mat-card-content class="p-4">
+    <!-- Titre -->
+    <h3 class="text-xl font-bold mb-2 line-clamp-1">
+      {{ annonce.titre }}
+    </h3>
+
+    <!-- Localisation -->
+    <div class="flex items-center text-gray-600 mb-2">
+      <mat-icon class="text-sm mr-1">location_on</mat-icon>
+      <span class="text-sm">{{ annonce.adresse.ville }}, {{ annonce.adresse.province }}</span>
+    </div>
+
+    <!-- Description courte -->
+    <p class="text-gray-700 text-sm mb-3 line-clamp-2">
+      {{ annonce.descriptionCourte }}
+    </p>
+
+    <!-- Date de disponibilité -->
+    <div class="flex items-center text-gray-600 mb-3">
+      <mat-icon class="text-sm mr-1">calendar_today</mat-icon>
+      <span class="text-sm">Disponible le {{ annonce.dateDisponibilite | date: 'dd/MM/yyyy' }}</span>
+    </div>
+
+    <!-- Stats -->
+    <div class="flex items-center justify-between pt-3 border-t">
+      <div class="flex items-center text-gray-500 text-sm">
+        <mat-icon class="text-sm mr-1">visibility</mat-icon>
+        <span>{{ annonce.nombreConsultations }} vues</span>
+      </div>
+      <button mat-button color="primary" (click)="viewDetails(); $event.stopPropagation()">
+        Détails
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { Annonce } from '../../shared/models';
+import { Annonce } from '../../shared/models/annonce.model';
 
 @Injectable({
   providedIn: 'root'
