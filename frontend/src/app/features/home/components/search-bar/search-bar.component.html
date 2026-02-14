@@ -1,0 +1,30 @@
+<div class="w-full max-w-2xl mx-auto">
+    <mat-form-field class="w-full" appearance="outline">
+      <mat-label>Rechercher un logement</mat-label>
+      <input 
+        matInput 
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Ville, quartier, type de logement..."
+      />
+      <mat-icon matPrefix>search</mat-icon>
+      <button 
+        mat-icon-button 
+        matSuffix 
+        *ngIf="searchQuery" 
+        (click)="onClear()"
+        aria-label="Effacer"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      class="ml-2"
+      (click)="onSearch()"
+    >
+      <mat-icon>search</mat-icon>
+      Rechercher
+    </button>
+  </div>

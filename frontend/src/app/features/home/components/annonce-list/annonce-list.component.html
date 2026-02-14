@@ -1,0 +1,28 @@
+<!-- Loader -->
+@if (loading) {
+  <div class="flex justify-center items-center py-12">
+    <mat-spinner></mat-spinner>
+  </div>
+}
+
+<!-- Liste vide -->
+@if (!loading && annonces.length === 0) {
+  <div class="text-center py-12">
+    <mat-icon class="text-6xl text-gray-400 mb-4">home_work</mat-icon>
+    <h3 class="text-xl text-gray-600 mb-2">Aucune annonce trouvée</h3>
+    <p class="text-gray-500">Essayez de modifier vos critères de recherche</p>
+  </div>
+}
+
+<!-- Grille d'annonces -->
+@if (!loading && annonces.length > 0) {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    
+    @for (annonce of annonces; track annonce.id) {
+      <app-annonce-card
+        [annonce]="annonce">
+      </app-annonce-card>
+    }
+
+  </div>
+}
