@@ -6,7 +6,7 @@ import {HomePageComponent} from '@app/features/home/pages/home-page/home-page.co
 
 @Component({
   selector: 'app-root',
-  imports: [NavbarComponent,FooterComponent,HomePageComponent,RouterOutlet],
+  imports: [NavbarComponent,FooterComponent,RouterOutlet],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })

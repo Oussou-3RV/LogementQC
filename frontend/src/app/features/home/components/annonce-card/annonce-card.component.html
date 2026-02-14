@@ -1,52 +1,68 @@
-<mat-card class="h-full hover:shadow-xl transition-shadow duration-300 cursor-pointer" 
-          (click)="viewDetails()">
+<mat-card 
+  class="group h-full rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100"
+  (click)="viewDetails()"
+>
+
   <!-- Image -->
-  <div class="relative h-48 overflow-hidden">
+  <div class="relative h-52 overflow-hidden">
+
     <img 
       [src]="getMainPhoto()" 
       [alt]="annonce.titre"
-      class="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
     />
-    <div class="absolute top-2 right-2">
-      <mat-chip class="bg-white shadow-md">
-        {{ annonce.montantMensuel | currency: 'CAD':'symbol':'1.0-0' }}/mois
-      </mat-chip>
+
+    <!-- Overlay gradient -->
+    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+
+    <!-- Prix badge -->
+    <div class="absolute bottom-3 left-3">
+      <span class="bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+        {{ annonce.montantMensuel | currency:'CAD':'symbol':'1.0-0' }}
+        <span class="text-gray-500 text-xs">/mois</span>
+      </span>
     </div>
+
   </div>
 
-  <mat-card-content class="p-4">
+  <!-- Contenu -->
+  <mat-card-content class="p-5 space-y-3">
+
     <!-- Titre -->
-    <h3 class="text-xl font-bold mb-2 line-clamp-1">
+    <h3 class="text-lg font-semibold text-white line-clamp-1">
       {{ annonce.titre }}
     </h3>
 
     <!-- Localisation -->
-    <div class="flex items-center text-gray-600 mb-2">
-      <mat-icon class="text-sm mr-1">location_on</mat-icon>
-      <span class="text-sm">{{ annonce.adresse.ville }}, {{ annonce.adresse.province }}</span>
+    <div class="flex items-center text-gray-500 text-sm">
+      <mat-icon class="text-base mr-1 text-gray-400">location_on</mat-icon>
+      {{ annonce.adresse.ville }}, {{ annonce.adresse.province }}
     </div>
 
-    <!-- Description courte -->
-    <p class="text-gray-700 text-sm mb-3 line-clamp-2">
+    <!-- Description -->
+    <p class="text-gray-200 text-sm line-clamp-2">
       {{ annonce.descriptionCourte }}
     </p>
 
-    <!-- Date de disponibilité -->
-    <div class="flex items-center text-gray-600 mb-3">
-      <mat-icon class="text-sm mr-1">calendar_today</mat-icon>
-      <span class="text-sm">Disponible le {{ annonce.dateDisponibilite | date: 'dd/MM/yyyy' }}</span>
+    <!-- Divider -->
+    <div class="border-t pt-3 flex items-center justify-between">
+
+      <div class="flex items-center text-xs text-gray-500">
+        <mat-icon class="text-base mr-1">visibility</mat-icon>
+        {{ annonce.nombreConsultations }} vues
+      </div>
+
+      <button
+        mat-stroked-button
+        color="primary"
+        class="rounded-full"
+        (click)="viewDetails(); $event.stopPropagation()"
+      >
+        Voir
+      </button>
+
     </div>
 
-    <!-- Stats -->
-    <div class="flex items-center justify-between pt-3 border-t">
-      <div class="flex items-center text-gray-500 text-sm">
-        <mat-icon class="text-sm mr-1">visibility</mat-icon>
-        <span>{{ annonce.nombreConsultations }} vues</span>
-      </div>
-      <button mat-button color="primary" (click)="viewDetails(); $event.stopPropagation()">
-        Détails
-        <mat-icon>arrow_forward</mat-icon>
-      </button>
-    </div>
   </mat-card-content>
+
 </mat-card>
