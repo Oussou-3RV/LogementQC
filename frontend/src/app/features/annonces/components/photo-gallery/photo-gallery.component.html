@@ -1,0 +1,54 @@
+<div class="photo-gallery">
+    <!-- Photo principale -->
+    <div class="relative bg-gray-900 rounded-lg overflow-hidden" style="height: 500px;">
+      <img 
+        [src]="currentPhoto" 
+        alt="Photo principale"
+        class="w-full h-full object-contain"
+      />
+      
+      <!-- Navigation -->
+      <button 
+        mat-icon-button 
+        class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100"
+        (click)="previousPhoto()"
+        [disabled]="currentPhotoIndex === 0"
+        *ngIf="photos.length > 1"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      
+      <button 
+        mat-icon-button 
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-75 hover:bg-opacity-100"
+        (click)="nextPhoto()"
+        [disabled]="currentPhotoIndex === photos.length - 1"
+        *ngIf="photos.length > 1"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+  
+      <!-- Compteur -->
+      <div class="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded">
+        {{ currentPhotoIndex + 1 }} / {{ photos.length }}
+      </div>
+    </div>
+  
+    <!-- Miniatures -->
+    <div class="flex gap-2 mt-4 overflow-x-auto" *ngIf="photos.length > 1">
+      <div 
+        *ngFor="let photo of photos; let i = index"
+        class="flex-shrink-0 cursor-pointer rounded overflow-hidden border-2 transition-all"
+        [class.border-blue-500]="i === currentPhotoIndex"
+        [class.border-gray-300]="i !== currentPhotoIndex"
+        (click)="selectPhoto(i)"
+        style="width: 100px; height: 75px;"
+      >
+        <img 
+          [src]="photo" 
+          [alt]="'Miniature ' + (i + 1)"
+          class="w-full h-full object-cover"
+        />
+      </div>
+    </div>
+  </div>
