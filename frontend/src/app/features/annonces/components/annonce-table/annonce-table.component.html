@@ -1,0 +1,119 @@
+<div class="overflow-x-auto">
+    <table mat-table [dataSource]="annonces" class="w-full">
+  
+      <!-- Photo Column -->
+      <ng-container matColumnDef="photo">
+        <th mat-header-cell *matHeaderCellDef class="w-24">Photo</th>
+        <td mat-cell *matCellDef="let annonce">
+          <img 
+            [src]="getMainPhoto(annonce)" 
+            [alt]="annonce.titre"
+            class="w-16 h-12 object-cover rounded cursor-pointer"
+            (click)="viewDetails(annonce.id!)"
+          />
+        </td>
+      </ng-container>
+  
+      <!-- Titre Column -->
+      <ng-container matColumnDef="titre">
+        <th mat-header-cell *matHeaderCellDef>Titre</th>
+        <td mat-cell *matCellDef="let annonce">
+          <div class="cursor-pointer hover:text-blue-600" (click)="viewDetails(annonce.id!)">
+            <div class="font-semibold">{{ annonce.titre }}</div>
+            <div class="text-sm text-gray-600">{{ annonce.adresse.rue }}</div>
+          </div>
+        </td>
+      </ng-container>
+  
+      <!-- Ville Column -->
+      <ng-container matColumnDef="ville">
+        <th mat-header-cell *matHeaderCellDef>Ville</th>
+        <td mat-cell *matCellDef="let annonce">
+          <div class="flex items-center">
+            <mat-icon class="text-sm mr-1">location_on</mat-icon>
+            {{ annonce.adresse.ville }}
+          </div>
+        </td>
+      </ng-container>
+  
+      <!-- Montant Column -->
+      <ng-container matColumnDef="montant">
+        <th mat-header-cell *matHeaderCellDef>Loyer</th>
+        <td mat-cell *matCellDef="let annonce">
+          <span class="font-semibold text-blue-600">
+            {{ annonce.montantMensuel | currency: 'CAD':'symbol':'1.0-0' }}
+          </span>
+          <span class="text-sm text-gray-600">/mois</span>
+        </td>
+      </ng-container>
+  
+      <!-- Vues Column -->
+      <ng-container matColumnDef="vues">
+        <th mat-header-cell *matHeaderCellDef>Vues</th>
+        <td mat-cell *matCellDef="let annonce">
+          <div class="flex items-center">
+            <mat-icon class="text-sm mr-1">visibility</mat-icon>
+            {{ annonce.nombreConsultations }}
+          </div>
+        </td>
+      </ng-container>
+  
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Statut</th>
+        <td mat-cell *matCellDef="let annonce">
+          <mat-chip 
+            [class.bg-green-100]="annonce.active"
+            [class.text-green-800]="annonce.active"
+            [class.bg-gray-100]="!annonce.active"
+            [class.text-gray-800]="!annonce.active"
+          >
+            <mat-icon class="text-sm mr-1">
+              {{ annonce.active ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+            {{ annonce.active ? 'Active' : 'Inactive' }}
+          </mat-chip>
+        </td>
+      </ng-container>
+  
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let annonce">
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="viewDetails(annonce.id!)">
+              <mat-icon>visibility</mat-icon>
+              <span>Voir</span>
+            </button>
+            <button mat-menu-item (click)="onEdit(annonce.id!)">
+              <mat-icon>edit</mat-icon>
+              <span>Modifier</span>
+            </button>
+            <button mat-menu-item (click)="onToggleStatus(annonce.id!)">
+              <mat-icon>{{ annonce.active ? 'pause_circle' : 'play_circle' }}</mat-icon>
+              <span>{{ annonce.active ? 'Désactiver' : 'Activer' }}</span>
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="onDelete(annonce.id!)" class="text-red-600">
+              <mat-icon class="text-red-600">delete</mat-icon>
+              <span>Supprimer</span>
+            </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+  
+      <!-- Message si vide -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell text-center py-12" [attr.colspan]="displayedColumns.length">
+          <mat-icon class="text-6xl text-gray-400 mb-4 !h-14 !w-14">inbox</mat-icon>
+          <p class="text-gray-600">Aucune annonce pour le moment</p>
+        </td>
+      </tr>
+    </table>
+  </div>

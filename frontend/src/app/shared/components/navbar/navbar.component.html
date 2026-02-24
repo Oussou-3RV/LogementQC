@@ -22,7 +22,7 @@
       <!-- Actions utilisateur -->
       <div class="flex items-center space-x-2">
         <ng-container *ngIf="!isAuthenticated">
-          <button mat-button (click)="navigateTo('/auth/login')">
+          <button mat-button (click)="navigateTo('/auth/login')" class="">
             Connexion
           </button>
           <button mat-raised-button color="accent" routerLink="/auth/register">
@@ -39,7 +39,7 @@
               <mat-icon>person</mat-icon>
               <span>Mon Profil</span>
             </button>
-            <button mat-menu-item (click)="navigateTo('/annonces/mes-annonces')">
+            <button mat-menu-item (click)="navigateTo('annonces/mes-annonces')">
               <mat-icon>list</mat-icon>
               <span>Mes Annonces</span>
             </button>

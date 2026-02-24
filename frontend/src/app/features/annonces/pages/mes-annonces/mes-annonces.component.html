@@ -1,0 +1,136 @@
+<div class="container mx-auto px-4 py-8">
+  
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+          <mat-icon class="mr-2 text-blue-600">list_alt</mat-icon>
+          Mes annonces
+        </h1>
+        <p class="text-gray-600 mt-2">Gérez vos annonces de logements</p>
+      </div>
+      <button 
+        mat-raised-button 
+        color="primary"
+        (click)="goToCreateAnnonce()"
+      >
+        <mat-icon>add</mat-icon>
+        Nouvelle annonce
+      </button>
+    </div>
+  
+    <!-- Loader -->
+    <div *ngIf="loading" class="flex justify-center items-center py-20">
+      <mat-spinner></mat-spinner>
+    </div>
+  
+    <!-- Contenu -->
+    <div *ngIf="!loading">
+      
+      <!-- Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <mat-card class="bg-blue-50">
+          <mat-card-content class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Total</p>
+              <p class="text-3xl font-bold text-blue-600">{{ allAnnonces.length }}</p>
+            </div>
+            <mat-icon class="text-5xl text-blue-600 !h-14 !w-14">list</mat-icon>
+          </mat-card-content>
+        </mat-card>
+  
+        <mat-card class="bg-green-50">
+          <mat-card-content class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Actives</p>
+              <p class="text-3xl font-bold text-green-600">{{ activeAnnonces.length }}</p>
+            </div>
+            <mat-icon class="text-5xl text-green-600 !h-14 !w-14">check_circle</mat-icon>
+          </mat-card-content>
+        </mat-card>
+  
+        <mat-card class="bg-gray-50">
+          <mat-card-content class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-600">Inactives</p>
+              <p class="text-3xl font-bold text-gray-600">{{ inactiveAnnonces.length }}</p>
+            </div>
+            <mat-icon class="text-5xl text-gray-600 !h-14 !w-14">pause_circle</mat-icon>
+          </mat-card-content>
+        </mat-card>
+      </div>
+  
+      <!-- Tabs -->
+      <mat-card>
+        <mat-card-content class="p-0">
+          <mat-tab-group>
+            
+            <!-- Toutes -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <mat-icon class="mr-2">list</mat-icon>
+                Toutes ({{ allAnnonces.length }})
+              </ng-template>
+              <div class="p-4">
+                <app-annonce-table 
+                  [annonces]="allAnnonces"
+                  (toggleStatus)="onToggleStatus($event)"
+                  (edit)="onEdit($event)"
+                  (delete)="onDelete($event)"
+                ></app-annonce-table>
+              </div>
+            </mat-tab>
+  
+            <!-- Actives -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <mat-icon class="mr-2 ">check_circle</mat-icon>
+                Actives ({{ activeAnnonces.length }})
+              </ng-template>
+              <div class="p-4">
+                <app-annonce-table 
+                  [annonces]="activeAnnonces"
+                  (toggleStatus)="onToggleStatus($event)"
+                  (edit)="onEdit($event)"
+                  (delete)="onDelete($event)"
+                ></app-annonce-table>
+              </div>
+            </mat-tab>
+  
+            <!-- Inactives -->
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <mat-icon class="mr-2">pause_circle</mat-icon>
+                Inactives ({{ inactiveAnnonces.length }})
+              </ng-template>
+              <div class="p-4">
+                <app-annonce-table 
+                  [annonces]="inactiveAnnonces"
+                  (toggleStatus)="onToggleStatus($event)"
+                  (edit)="onEdit($event)"
+                  (delete)="onDelete($event)"
+                ></app-annonce-table>
+              </div>
+            </mat-tab>
+  
+          </mat-tab-group>
+        </mat-card-content>
+      </mat-card>
+  
+      <!-- Message si vide -->
+      <div *ngIf="allAnnonces.length === 0" class="text-center py-12">
+        <mat-icon class="text-6xl text-gray-400 mb-4 !h-14 !w-14">inbox</mat-icon>
+        <h3 class="text-xl text-gray-600 mb-4">Aucune annonce</h3>
+        <p class="text-gray-500 mb-6">Vous n'avez pas encore publié d'annonce</p>
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="goToCreateAnnonce()"
+        >
+          <mat-icon>add</mat-icon>
+          Publier ma première annonce
+        </button>
+      </div>
+  
+    </div>
+  </div>

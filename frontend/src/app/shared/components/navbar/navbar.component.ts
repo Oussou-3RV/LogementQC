@@ -23,8 +23,7 @@ import { CdkStepLabel } from "@angular/cdk/stepper";
     MatIconModule,
     MatMenuModule,
     MatBadgeModule,
-    MatDivider,
-    CdkStepLabel
+    MatDivider
 ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
