@@ -19,6 +19,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
+// tous les composants materiel dont on aura besoin
+
 const MaterialComponents = [
   MatButtonModule,
   MatIconModule,

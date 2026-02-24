@@ -43,25 +43,25 @@
           <mat-divider class="my-4"></mat-divider>
   
           <!-- Infos rapides -->
-          <div class="flex flex-wrap gap-4 mb-4">
-            <mat-chip class="flex items-center">
-              <mat-icon class="mr-1">calendar_today</mat-icon>
-              Disponible le {{ annonce.dateDisponibilite | date: 'dd MMMM yyyy' }}
+          <div class="flex flex-wrap gap-4 my-4">
+            <mat-chip class="flex items-center ">
+              <mat-icon class="mr-1 text-gray-500">calendar_today</mat-icon>
+              <span class="text-black ">Disponible le {{ annonce.dateDisponibilite | date: 'dd MMMM yyyy' }}</span>
             </mat-chip>
             <mat-chip class="flex items-center">
-              <mat-icon class="mr-1">visibility</mat-icon>
+              <mat-icon class="mr-1 text-gray-500">visibility</mat-icon>
               {{ annonce.nombreConsultations }} vues
             </mat-chip>
             <mat-chip class="flex items-center" [ngClass]="annonce.active ? 'bg-green-100' : 'bg-gray-100'">
-              <mat-icon class="mr-1">{{ annonce.active ? 'check_circle' : 'cancel' }}</mat-icon>
-              {{ annonce.active ? 'Active' : 'Inactive' }}
+              <mat-icon class="mr-1 ">{{ annonce.active ? 'check_circle' : 'cancel' }}</mat-icon>
+              <span >{{ annonce.active ? 'Active' : 'Inactive' }}</span>
             </mat-chip>
           </div>
   
           <mat-divider class="my-4"></mat-divider>
   
           <!-- Description courte -->
-          <div class="mb-4">
+          <div class="my-4">
             <h2 class="text-xl font-semibold mb-2">Résumé</h2>
             <p class="text-gray-700 text-lg">{{ annonce.descriptionCourte }}</p>
           </div>

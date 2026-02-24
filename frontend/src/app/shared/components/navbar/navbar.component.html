@@ -1,5 +1,5 @@
-<mat-toolbar color="primary" class="shadow-md">
-    <div class="container mx-auto flex items-center justify-between px-4">
+<div class="shadow-md  bg-white shadow-lg">
+    <div class="container mx-auto flex items-center justify-between p-4">
       <!-- Logo et titre -->
       <div class="flex items-center space-x-2 cursor-pointer" (click)="navigateTo('/')">
         <mat-icon>home</mat-icon>
@@ -7,15 +7,15 @@
       </div>
   
       <!-- Navigation -->
-      <nav class="hidden md:flex space-x-4">
-        <button mat-button (click)="navigateTo('/')">
-          <mat-icon>search</mat-icon>
-          Annonces
+      <nav class="hidden  md:flex space-x-4">
+        <button  mat-button (click)="navigateTo('/')">
+          <mat-icon class="text-black">search</mat-icon>
+          <span class="text-black">Annonces</span>
         </button>
         
         <button mat-button (click)="navigateTo('/annonces/create')" *ngIf="isAuthenticated">
-          <mat-icon>add_circle</mat-icon>
-          Publier
+          <mat-icon class="text-green-800">add_circle</mat-icon>
+          <span class="text-green-800">Publier</span>
         </button>
       </nav>
   
@@ -32,7 +32,7 @@
   
         <ng-container *ngIf="isAuthenticated">
           <button mat-icon-button [matMenuTriggerFor]="userMenu">
-            <mat-icon>account_circle</mat-icon>
+            <mat-icon class="text-black">account_circle</mat-icon>
           </button>
           <mat-menu #userMenu="matMenu">
             <button mat-menu-item (click)="navigateTo('/profile')">
@@ -56,4 +56,4 @@
         </ng-container>
       </div>
     </div>
-  </mat-toolbar>
+  </div>

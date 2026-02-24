@@ -33,7 +33,7 @@ import { ContactFormComponent } from '../../components/contact-form/contact-form
 export class AnnonceDetailComponent implements OnInit {
   annonce: Annonce | undefined;
   loading = true;
-  isAuthenticated = false; // TODO: Sera géré par AuthService plus tard
+  isAuthenticated = true; // TODO: Sera géré par AuthService plus tard
   currentUserId = 'user-logged-in'; // TODO: Récupérer de AuthService
 
   constructor(

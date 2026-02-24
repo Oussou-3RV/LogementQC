@@ -10,20 +10,22 @@ import { MatDivider } from '@angular/material/divider';
 import { Subscription } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
 import { User } from '@app/shared/models/user.model';
+import { CdkStepLabel } from "@angular/cdk/stepper";
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
+    CommonModule,
+    RouterModule,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
     MatBadgeModule,
-    MatDivider
-  ],
+    MatDivider,
+    CdkStepLabel
+],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })

@@ -1,15 +1,15 @@
 <mat-card>
-    <mat-card-header>
-      <mat-card-title>
+    <mat-card-header class="bg-orange-600 ">
+      <mat-card-title class="pb-3">
         <mat-icon class="align-middle mr-2">mail</mat-icon>
         Contacter l'annonceur
       </mat-card-title>
     </mat-card-header>
   
-    <mat-card-content>
-      <div *ngIf="!isAuthenticated" class="bg-yellow-50 border border-yellow-200 rounded p-4 mb-4">
+    <mat-card-content class="bg-white">
+      <div *ngIf="!isAuthenticated" class="bg-yellow-50 border border-yellow-200 rounded  my-4">
         <div class="flex items-start">
-          <mat-icon class="text-yellow-600 mr-2">info</mat-icon>
+          <mat-icon class="text-yellow-600 pr-6">info</mat-icon>
           <div>
             <p class="font-semibold text-yellow-800">Connexion requise</p>
             <p class="text-yellow-700 text-sm">
@@ -21,9 +21,9 @@
         </div>
       </div>
   
-      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" *ngIf="isAuthenticated">
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" *ngIf="isAuthenticated" >
         <!-- Sujet -->
-        <mat-form-field class="w-full" appearance="outline">
+        <mat-form-field class="w-full pt-3" >
           <mat-label>Sujet</mat-label>
           <input 
             matInput 
@@ -39,7 +39,7 @@
         </mat-form-field>
   
         <!-- Message -->
-        <mat-form-field class="w-full" appearance="outline">
+        <mat-form-field class="w-full" >
           <mat-label>Message</mat-label>
           <textarea 
             matInput 
