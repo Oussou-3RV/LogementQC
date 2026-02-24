@@ -12,6 +12,8 @@ import { AnnonceService } from '@app/core/services/annonce.service';
 import { MessageService } from '@app/core/services/message.service';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery.component';
 import { ContactFormComponent } from '../../components/contact-form/contact-form.component';
+import { AuthService } from '../../../../core/services/auth.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-annonce-detail',
@@ -33,24 +35,36 @@ import { ContactFormComponent } from '../../components/contact-form/contact-form
 export class AnnonceDetailComponent implements OnInit {
   annonce: Annonce | undefined;
   loading = true;
-  isAuthenticated = true; // TODO: Sera géré par AuthService plus tard
-  currentUserId = 'user-logged-in'; // TODO: Récupérer de AuthService
+  isAuthenticated = false; // TODO: Sera géré par AuthService plus tard
+  currentUserId = ''; // TODO: Récupérer de AuthService
+  private authSubscription?: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private annonceService: AnnonceService,
     private messageService: MessageService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // S'abonner à l'état d'authentification
+    this.authSubscription = this.authService.currentUser$.subscribe(user => {
+      this.isAuthenticated = !!user;
+      this.currentUserId = user?.id || '';
+    });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadAnnonce(id);
     } else {
       this.router.navigate(['/']);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
   }
 
   loadAnnonce(id: string): void {
