@@ -1,0 +1,32 @@
+[
+    {
+      "id": "user1",
+      "email": "balde.doe@example.com",
+      "nom": "balde",
+      "prenom": "ousmane",
+      "telephone": "514-555-0123",
+      "adresse": {
+        "rue": "123 Rue Example",
+        "ville": "Montréal",
+        "province": "QC",
+        "codePostal": "H1A 1A1",
+        "pays": "Canada"
+      },
+      "createdAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "user2",
+      "email": "mariame.tremblay@example.com",
+      "nom": "Aoudy",
+      "prenom": "Mariame",
+      "telephone": "418-555-0456",
+      "adresse": {
+        "rue": "456 Boulevard Saint-Laurent",
+        "ville": "Québec",
+        "province": "QC",
+        "codePostal": "G1R 2L5",
+        "pays": "Canada"
+      },
+      "createdAt": "2024-01-05T00:00:00.000Z"
+    }
+  ]

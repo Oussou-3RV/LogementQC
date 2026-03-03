@@ -35,7 +35,7 @@ import { Subscription } from 'rxjs';
 export class AnnonceDetailComponent implements OnInit {
   annonce: Annonce | undefined;
   loading = true;
-  isAuthenticated = false; // TODO: Sera géré par AuthService plus tard
+  isAuthenticated = false; // Géré par AuthService 
   currentUserId = ''; // TODO: Récupérer de AuthService
   private authSubscription?: Subscription;
 

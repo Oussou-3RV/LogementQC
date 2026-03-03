@@ -1,95 +1,60 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { Annonce } from '@app/shared/models/annonce.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { delay, tap, map, catchError } from 'rxjs/operators';
+import { Annonce } from '../../shared/models/annonce.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AnnonceService {
   
-  // Utilisation de BehaviorSubject pour gérer les annonces de manière réactive
-  private annoncesSubject = new BehaviorSubject<Annonce[]>([
-    {
-      id: '1',
-      titre: 'Bel appartement 3½ au centre-ville',
-      descriptionCourte: 'Appartement lumineux avec vue sur le fleuve',
-      descriptionLongue: 'Magnifique appartement de 3½ pièces situé au cœur du centre-ville. Proche de tous les services, transport en commun à proximité. Cuisine moderne, salle de bain rénovée.',
-      montantMensuel: 950,
-      dateDisponibilite: new Date('2024-03-01'),
-      photos: [
-        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800'
-      ],
-      adresse: {
-        rue: '123 Rue des Forges',
-        ville: 'Trois-Rivières',
-        province: 'QC',
-        codePostal: 'G8Z 1T3',
-        pays: 'Canada',
-        latitude: 46.3432,
-        longitude: -72.5477
-      },
-      userId: 'user1',
-      nombreConsultations: 45,
-      active: true,
-      createdAt: new Date('2024-01-15')
-    },
-    {
-      id: '2',
-      titre: 'Studio moderne meublé',
-      descriptionCourte: 'Parfait pour étudiant ou professionnel',
-      descriptionLongue: 'Studio entièrement meublé et équipé. Idéal pour étudiant UQTR ou jeune professionnel. Internet inclus, buanderie sur place.',
-      montantMensuel: 675,
-      dateDisponibilite: new Date('2024-02-15'),
-      photos: [
-        'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800'
-      ],
-      adresse: {
-        rue: '456 Boulevard des Récollets',
-        ville: 'Trois-Rivières',
-        province: 'QC',
-        codePostal: 'G8Z 2B8',
-        pays: 'Canada',
-        latitude: 46.3456,
-        longitude: -72.5489
-      },
-      userId: 'user2',
-      nombreConsultations: 78,
-      active: true,
-      createdAt: new Date('2024-01-20')
-    },
-    {
-      id: '3',
-      titre: 'Maison 4 chambres avec jardin',
-      descriptionCourte: 'Idéale pour famille',
-      descriptionLongue: 'Grande maison familiale avec 4 chambres, 2 salles de bain. Grand jardin clôturé, garage double, sous-sol aménagé. Quartier calme et sécuritaire.',
-      montantMensuel: 1650,
-      dateDisponibilite: new Date('2024-04-01'),
-      photos: [
-        'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800',
-        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'
-      ],
-      adresse: {
-        rue: '789 Rue Notre-Dame',
-        ville: 'Trois-Rivières',
-        province: 'QC',
-        codePostal: 'G8Z 3K5',
-        pays: 'Canada',
-        latitude: 46.3512,
-        longitude: -72.5423
-      },
-      userId: 'user1',
-      nombreConsultations: 123,
-      active: true,
-      createdAt: new Date('2024-01-10')
-    }
-  ]);
+  private readonly DATA_URL = 'assets/data/annonces.json';
+  private annoncesSubject = new BehaviorSubject<Annonce[]>([]);
+  private dataLoaded = false;
 
-  constructor() { }
+  constructor(private http: HttpClient) {
+    this.loadInitialData();
+  }
+
+  // Charger les données initiales depuis le fichier JSON
+  private loadInitialData(): void {
+    this.http.get<Annonce[]>(this.DATA_URL).pipe(
+      map(annonces => annonces.map(a => ({
+        ...a,
+        dateDisponibilite: new Date(a.dateDisponibilite),
+        createdAt: a.createdAt ? new Date(a.createdAt) : undefined,
+        updatedAt: a.updatedAt ? new Date(a.updatedAt) : undefined
+      }))),
+      tap(annonces => {
+        this.annoncesSubject.next(annonces);
+        this.dataLoaded = true;
+        console.log('Annonces chargées depuis JSON:', annonces.length);
+      }),
+      catchError(error => {
+        console.error('Erreur lors du chargement des annonces:', error);
+        return of([]);
+      })
+    ).subscribe();
+  }
 
   // Récupérer toutes les annonces actives
   getAnnonces(): Observable<Annonce[]> {
+    if (!this.dataLoaded) {
+      // Attendre que les données soient chargées
+      return this.http.get<Annonce[]>(this.DATA_URL).pipe(
+        map(annonces => annonces
+          .filter(a => a.active)
+          .map(a => ({
+            ...a,
+            dateDisponibilite: new Date(a.dateDisponibilite),
+            createdAt: a.createdAt ? new Date(a.createdAt) : undefined,
+            updatedAt: a.updatedAt ? new Date(a.updatedAt) : undefined
+          }))
+        ),
+        delay(500)
+      );
+    }
     return of(this.annoncesSubject.value.filter(a => a.active)).pipe(
       delay(500)
     );
@@ -115,7 +80,7 @@ export class AnnonceService {
     return of(results).pipe(delay(400));
   }
 
-  // Créer une nouvelle annonce
+  // Créer une nouvelle annonce (simulation - s'arrête au service)
   createAnnonce(annonce: Omit<Annonce, 'id' | 'createdAt' | 'updatedAt'>): Observable<Annonce> {
     const newAnnonce: Annonce = {
       ...annonce,
@@ -124,9 +89,11 @@ export class AnnonceService {
       updatedAt: new Date()
     };
 
-    // Ajouter au début de la liste
+    // Simulation : on ajoute en mémoire mais on ne persiste pas dans le fichier JSON
     const currentAnnonces = this.annoncesSubject.value;
     this.annoncesSubject.next([newAnnonce, ...currentAnnonces]);
+
+    console.log('📤 Simulation envoi au serveur (s\'arrête au service):', newAnnonce);
 
     return of(newAnnonce).pipe(delay(1000));
   }
@@ -137,7 +104,7 @@ export class AnnonceService {
     return of(userAnnonces).pipe(delay(300));
   }
 
-  // Mettre à jour une annonce
+  // Mettre à jour une annonce (simulation - s'arrête au service)
   updateAnnonce(id: string, updates: Partial<Annonce>): Observable<Annonce | undefined> {
     const currentAnnonces = this.annoncesSubject.value;
     const index = currentAnnonces.findIndex(a => a.id === id);
@@ -150,13 +117,16 @@ export class AnnonceService {
       };
       currentAnnonces[index] = updatedAnnonce;
       this.annoncesSubject.next([...currentAnnonces]);
+
+      console.log('📤 Simulation mise à jour au serveur (s\'arrête au service):', updatedAnnonce);
+
       return of(updatedAnnonce).pipe(delay(500));
     }
     
     return of(undefined).pipe(delay(500));
   }
 
-  // Activer/Désactiver une annonce
+  // Activer/Désactiver une annonce (simulation - s'arrête au service)
   toggleAnnonceStatus(id: string): Observable<Annonce | undefined> {
     const currentAnnonces = this.annoncesSubject.value;
     const index = currentAnnonces.findIndex(a => a.id === id);
@@ -165,19 +135,23 @@ export class AnnonceService {
       currentAnnonces[index].active = !currentAnnonces[index].active;
       currentAnnonces[index].updatedAt = new Date();
       this.annoncesSubject.next([...currentAnnonces]);
+
+      console.log('📤 Simulation toggle status au serveur (s\'arrête au service):', currentAnnonces[index]);
+
       return of(currentAnnonces[index]).pipe(delay(500));
     }
     
     return of(undefined).pipe(delay(500));
   }
 
-  // Incrémenter le nombre de consultations
+  // Incrémenter le nombre de consultations (simulation)
   incrementConsultations(id: string): void {
     const currentAnnonces = this.annoncesSubject.value;
     const annonce = currentAnnonces.find(a => a.id === id);
     if (annonce) {
       annonce.nombreConsultations++;
       this.annoncesSubject.next([...currentAnnonces]);
+      console.log('📤 Simulation incrémentation consultations (s\'arrête au service)');
     }
   }
 }
