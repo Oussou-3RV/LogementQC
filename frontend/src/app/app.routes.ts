@@ -3,6 +3,7 @@ import { HomePageComponent } from './features/home/pages/home-page/home-page.com
 import { AnnonceDetailComponent } from './features/annonces/pages/annonce-detail/annonce-detail.component';
 import { CreateAnnonceComponent } from './features/annonces/pages/create-annonce/create-annonce.component';
 import { MesAnnoncesComponent } from './features/annonces/pages/mes-annonces/mes-annonces.component';
+import { ProfilePageComponent } from './features/profile/pages/profile-page/profile-page.component';
 import { LoginComponent } from './features/auth/pages/login/login.component';
 import { RegisterComponent } from './features/auth/pages/register/register.component';
 import { ForgotPasswordComponent } from './features/auth/pages/forgot-password/forgot-password.component';
@@ -35,6 +36,10 @@ export const routes: Routes = [
   {
     path: 'annonces/:id',
     component: AnnonceDetailComponent
+  },
+  {
+    path: 'profile',
+    component: ProfilePageComponent
   },
   {
     path: '**',

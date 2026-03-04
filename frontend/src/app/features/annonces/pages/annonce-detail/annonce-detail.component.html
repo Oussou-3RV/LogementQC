@@ -50,11 +50,11 @@
             </mat-chip>
             <mat-chip class="flex items-center">
               <mat-icon class="mr-1 text-gray-500">visibility</mat-icon>
-              {{ annonce.nombreConsultations }} vues
+              <span class="text-black">{{ annonce.nombreConsultations }} vues</span>
             </mat-chip>
             <mat-chip class="flex items-center" [ngClass]="annonce.active ? 'bg-green-100' : 'bg-gray-100'">
               <mat-icon class="mr-1 ">{{ annonce.active ? 'check_circle' : 'cancel' }}</mat-icon>
-              <span >{{ annonce.active ? 'Active' : 'Inactive' }}</span>
+              <span [ngClass]="annonce.active ? 'text-green-500' : 'text-red-500'">{{ annonce.active ? 'Active' : 'Inactive' }}</span>
             </mat-chip>
           </div>
   

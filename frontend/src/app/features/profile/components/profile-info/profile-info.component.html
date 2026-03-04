@@ -1,0 +1,73 @@
+<mat-card class="mb-6">
+    <mat-card-content class="p-6">
+      <!-- Avatar et nom -->
+      <div class="flex items-center mb-6">
+        <div class="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-2xl font-bold mr-4">
+          {{ getInitials() }}
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-300">
+            {{ user.prenom }} {{ user.nom }}
+          </h2>
+          <p class="text-gray-600">{{ user.email }}</p>
+        </div>
+      </div>
+  
+      <mat-divider class="my-4"></mat-divider>
+  
+      <!-- Informations personnelles -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-blue-500 my-4">Informations personnelles</h3>
+  
+        <!-- Email -->
+        <div class="flex items-start">
+          <mat-icon class="text-gray-600 mr-3">email</mat-icon>
+          <div>
+            <p class="text-sm text-gray-600">Email</p>
+            <p class="font-medium">{{ user.email }}</p>
+          </div>
+        </div>
+  
+        <!-- Téléphone -->
+        <div class="flex items-start">
+          <mat-icon class="text-gray-600 mr-3">phone</mat-icon>
+          <div>
+            <p class="text-sm text-gray-600">Téléphone</p>
+            <p class="font-medium">{{ user.telephone }}</p>
+          </div>
+        </div>
+  
+        <!-- Adresse -->
+        <div class="flex items-start">
+          <mat-icon class="text-gray-600 mr-3">home</mat-icon>
+          <div>
+            <p class="text-sm text-gray-600">Adresse</p>
+            <p class="font-medium">{{ user.adresse.rue }}</p>
+            <p class="font-medium">
+              {{ user.adresse.ville }}, {{ user.adresse.province }} {{ user.adresse.codePostal }}
+            </p>
+            <p class="font-medium">{{ user.adresse.pays }}</p>
+          </div>
+        </div>
+  
+        <!-- Date de création -->
+        <div class="flex items-start" *ngIf="user.createdAt">
+          <mat-icon class="text-gray-600 mr-3">calendar_today</mat-icon>
+          <div>
+            <p class="text-sm text-gray-600">Membre depuis</p>
+            <p class="font-medium">{{ user.createdAt | date: 'dd MMMM yyyy' }}</p>
+          </div>
+        </div>
+      </div>
+  
+      <mat-divider class="my-6"></mat-divider>
+  
+      <!-- Actions -->
+      <div class="flex justify-center mt-3">
+        <button mat-raised-button color="primary" (click)="onEdit()">
+          <mat-icon class="!h-5 !w-5">edit</mat-icon>
+          Modifier mes informations
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>

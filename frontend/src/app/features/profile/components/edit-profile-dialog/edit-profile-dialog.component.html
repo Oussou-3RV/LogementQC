@@ -1,0 +1,126 @@
+<h2 mat-dialog-title class="flex items-center">
+    <mat-icon class="mr-2">edit</mat-icon>
+    Modifier mon profil
+  </h2>
+  
+  <mat-dialog-content>
+    <form [formGroup]="profileForm" class="space-y-4 pt-4">
+      
+      <!-- Prénom et Nom -->
+      <div class="grid grid-cols-2 gap-4">
+        <mat-form-field class="w-full" >
+          <mat-label>Prénom</mat-label>
+          <input matInput formControlName="prenom" />
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="submitted && f['prenom'].errors?.['required']">
+            Le prénom est obligatoire
+          </mat-error>
+        </mat-form-field>
+  
+        <mat-form-field class="w-full" >
+          <mat-label>Nom</mat-label>
+          <input matInput formControlName="nom" />
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="submitted && f['nom'].errors?.['required']">
+            Le nom est obligatoire
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <!-- Email -->
+      <mat-form-field class="w-full" >
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+        <mat-icon matPrefix>email</mat-icon>
+        <mat-error *ngIf="submitted && f['email'].errors?.['required']">
+          L'email est obligatoire
+        </mat-error>
+        <mat-error *ngIf="submitted && f['email'].errors?.['email']">
+          Email invalide
+        </mat-error>
+      </mat-form-field>
+  
+      <!-- Téléphone -->
+      <mat-form-field class="w-full" >
+        <mat-label>Téléphone</mat-label>
+        <input 
+          matInput 
+          formControlName="telephone"
+          (input)="formatPhoneNumber($event)"
+          maxlength="12"
+        />
+        <mat-icon matPrefix>phone</mat-icon>
+        <mat-error *ngIf="submitted && f['telephone'].errors?.['required']">
+          Le téléphone est obligatoire
+        </mat-error>
+        <mat-error *ngIf="submitted && f['telephone'].errors?.['pattern']">
+          Format: 514-555-0123
+        </mat-error>
+      </mat-form-field>
+  
+      <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-4">Adresse</h3>
+  
+      <!-- Rue -->
+      <mat-form-field class="w-full" >
+        <mat-label>Rue</mat-label>
+        <input matInput formControlName="rue" />
+        <mat-icon matPrefix>home</mat-icon>
+        <mat-error>L'adresse est obligatoire</mat-error>
+      </mat-form-field>
+  
+      <!-- Ville -->
+      <mat-form-field class="w-full" >
+        <mat-label>Ville</mat-label>
+        <input matInput formControlName="ville" />
+        <mat-icon matPrefix>location_city</mat-icon>
+        <mat-error>La ville est obligatoire</mat-error>
+      </mat-form-field>
+  
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Province -->
+        <mat-form-field class="w-full" >
+          <mat-label>Province</mat-label>
+          <input matInput formControlName="province" />
+          <mat-error>La province est obligatoire</mat-error>
+        </mat-form-field>
+  
+        <!-- Code Postal -->
+        <mat-form-field class="w-full" >
+          <mat-label>Code Postal</mat-label>
+          <input 
+            matInput 
+            formControlName="codePostal"
+            (input)="formatPostalCode($event)"
+            maxlength="7"
+          />
+          <mat-error *ngIf="submitted && f['codePostal'].errors?.['required']">
+            Le code postal est obligatoire
+          </mat-error>
+          <mat-error *ngIf="submitted && f['codePostal'].errors?.['pattern']">
+            Format: A1A 1A1
+          </mat-error>
+        </mat-form-field>
+      </div>
+  
+      <!-- Pays -->
+      <mat-form-field class="w-full" >
+        <mat-label>Pays</mat-label>
+        <input matInput formControlName="pays" />
+        <mat-icon matPrefix>public</mat-icon>
+        <mat-error>Le pays est obligatoire</mat-error>
+      </mat-form-field>
+  
+    </form>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Annuler</button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()"
+      [disabled]="profileForm.invalid && submitted"
+    >
+      Enregistrer
+    </button>
+  </mat-dialog-actions>

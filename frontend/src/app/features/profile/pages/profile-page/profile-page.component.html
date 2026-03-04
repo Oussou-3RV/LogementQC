@@ -1,0 +1,137 @@
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+  
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 flex items-center">
+        <mat-icon class="mr-2 text-blue-600">account_circle</mat-icon>
+        Mon Profil
+      </h1>
+      <p class="text-gray-600 mt-2">Gérez vos informations personnelles et vos annonces</p>
+    </div>
+  
+    <!-- Loader -->
+    <div *ngIf="loading" class="flex justify-center items-center py-20">
+      <mat-spinner></mat-spinner>
+    </div>
+  
+    <!-- Contenu -->
+    <div *ngIf="!loading && currentUser" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Colonne gauche: Informations du profil -->
+      <div class="lg:col-span-1">
+        <app-profile-info 
+          [user]="currentUser"
+          (edit)="onEditProfile()"
+          class="text-gray-300"
+        ></app-profile-info>
+  
+        <!-- Actions rapides -->
+        <mat-card>
+          <mat-card-content class="p-4">
+            <h3 class="text-lg text-blue-500  font-semibold mb-4">Actions rapides</h3>
+            <div class="space-y-2">
+              <button 
+                mat-stroked-button 
+                class="w-full justify-start"
+                (click)="goToCreateAnnonce()"
+              >
+                <mat-icon>add_circle</mat-icon>
+                Publier une annonce
+              </button>
+              <button 
+                mat-stroked-button 
+                class="w-full justify-start"
+                (click)="goToMesAnnonces()"
+              >
+                <mat-icon>list</mat-icon>
+                Mes annonces
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+  
+      <!-- Colonne droite: Statistiques et annonces -->
+      <div class="lg:col-span-2">
+        
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <mat-card class="bg-blue-50">
+            <mat-card-content class="text-center p-4">
+              <mat-icon class="text-4xl text-blue-600 mb-2 !h-14 !w-14">list</mat-icon>
+              <p class="text-2xl font-bold text-blue-600">{{ userAnnonces.length }}</p>
+              <p class="text-sm text-gray-600">Annonces totales</p>
+            </mat-card-content>
+          </mat-card>
+  
+          <mat-card class="bg-green-50">
+            <mat-card-content class="text-center p-4">
+              <mat-icon class="text-4xl text-green-600 mb-2 !h-14 !w-14">check_circle</mat-icon>
+              <p class="text-2xl font-bold text-green-600">
+                {{ (userAnnonces | filter: 'active': true).length }}
+              </p>
+              <p class="text-sm text-gray-600">Annonces actives</p>
+            </mat-card-content>
+          </mat-card>
+  
+          <mat-card class="bg-orange-50">
+            <mat-card-content class="text-center p-4">
+              <mat-icon class="text-4xl text-orange-600 mb-2 !h-14 !w-14">visibility</mat-icon>
+              <p class="text-2xl font-bold text-orange-600">
+                {{ getTotalViews() }}
+              </p>
+              <p class="text-sm text-gray-600">Vues totales</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
+  
+        <!-- Mes annonces récentes -->
+        <mat-card>
+          <mat-card-header class="pb-4">
+            <mat-card-title class="flex items-center justify-between w-full">
+              <span class="flex items-center">
+                <mat-icon class="text-gray-200 mr-2">home_work</mat-icon>
+                <span class="text-gray-200">Mes annonces récentes</span>
+              </span>
+              <button 
+                mat-button 
+                color="primary"
+                (click)="goToMesAnnonces()"
+                *ngIf="userAnnonces.length > 0"
+              >
+                Voir tout
+                <mat-icon>arrow_forward</mat-icon>
+              </button>
+            </mat-card-title>
+          </mat-card-header>
+  
+          <mat-card-content>
+            <!-- Liste des annonces -->
+            <div *ngIf="userAnnonces.length > 0" class="grid grid-cols-1 gap-4">
+              <app-annonce-card 
+                *ngFor="let annonce of userAnnonces.slice(0, 3)" 
+                [annonce]="annonce"
+              ></app-annonce-card>
+            </div>
+  
+            <!-- Message si aucune annonce -->
+            <div *ngIf="userAnnonces.length === 0" class="text-center py-12">
+              <mat-icon class="text-6xl text-gray-400 mb-4 !h-14 !w-14">inbox</mat-icon>
+              <h3 class="text-xl text-gray-600 mb-4">Aucune annonce</h3>
+              <p class="text-gray-500 mb-6">Vous n'avez pas encore publié d'annonce</p>
+              <button 
+                mat-raised-button 
+                color="primary"
+                (click)="goToCreateAnnonce()"
+              >
+                <mat-icon>add</mat-icon>
+                Publier ma première annonce
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+  
+      </div>
+  
+    </div>
+  </div>
