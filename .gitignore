@@ -1,0 +1,9 @@
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Backend IDE files
+backend/**/.idea/
+backend/**/*.iml

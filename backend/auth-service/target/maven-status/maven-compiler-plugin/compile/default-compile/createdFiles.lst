@@ -1,1 +1,16 @@
 com/annonce/auth_service/AuthServiceApplication.class
+com/annonce/auth_service/dto/response/UserResponse$UserResponseBuilder.class
+com/annonce/auth_service/dto/response/UserResponse.class
+com/annonce/auth_service/repository/UserRepository.class
+com/annonce/auth_service/dto/request/ForgotPasswordRequest.class
+com/annonce/auth_service/dto/response/AuthResponse$AuthResponseBuilder.class
+com/annonce/auth_service/entity/User$UserBuilder.class
+com/annonce/auth_service/dto/request/ForgotPasswordRequest$ForgotPasswordRequestBuilder.class
+com/annonce/auth_service/dto/response/MessageResponse.class
+com/annonce/auth_service/dto/request/RegisterRequest$RegisterRequestBuilder.class
+com/annonce/auth_service/dto/request/LoginRequest.class
+com/annonce/auth_service/dto/response/MessageResponse$MessageResponseBuilder.class
+com/annonce/auth_service/dto/response/AuthResponse.class
+com/annonce/auth_service/dto/request/RegisterRequest.class
+com/annonce/auth_service/entity/User.class
+com/annonce/auth_service/dto/request/LoginRequest$LoginRequestBuilder.class

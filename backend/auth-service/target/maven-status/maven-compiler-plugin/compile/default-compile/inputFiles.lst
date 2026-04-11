@@ -1,1 +1,9 @@
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/AuthServiceApplication.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/dto/request/ForgotPasswordRequest.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/dto/request/LoginRequest.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/dto/request/RegisterRequest.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/dto/response/AuthResponse.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/dto/response/MessageResponse.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/dto/response/UserResponse.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/entity/User.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/auth-service/src/main/java/com/annonce/auth_service/repository/UserRepository.java
