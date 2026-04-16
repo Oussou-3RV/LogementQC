@@ -26,12 +26,13 @@ public class JwtUtils {
     }
 
     // Générer un token JWT
-    public String generateToken(String email) {
+    public String generateToken(String email, String userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtProperties.getExpiration());
 
         return Jwts.builder()
                 .subject(email)
+                .claim("userId", userId)  // ← AJOUT du userId
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())

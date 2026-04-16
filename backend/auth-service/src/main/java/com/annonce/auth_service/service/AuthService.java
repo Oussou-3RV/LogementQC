@@ -63,7 +63,7 @@ public class AuthService {
         log.info("User registered successfully with id: {}", savedUser.getId());
 
         // Générer le token JWT
-        String token = jwtUtils.generateToken(savedUser.getEmail());
+        String token = jwtUtils.generateToken(savedUser.getEmail(),savedUser.getId());
 
         // Construire la réponse
         return AuthResponse.builder()
@@ -88,7 +88,7 @@ public class AuthService {
                     .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
 
             // Générer le token JWT
-            String token = jwtUtils.generateToken(user.getEmail());
+            String token = jwtUtils.generateToken(user.getEmail(),user.getId());
 
             log.info("User logged in successfully: {}", user.getEmail());
 
