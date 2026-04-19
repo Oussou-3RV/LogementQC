@@ -1,149 +1,127 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatTabsModule } from '@angular/material/tabs';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AnnonceService } from '../../../../core/services/annonce.service';
 import { AnnonceResponse } from '../../../../core/services/annonce-http.service';
-import { ProfileInfoComponent } from '../../components/profile-info/profile-info.component';
-import { EditProfileDialogComponent } from '../../components/edit-profile-dialog/edit-profile-dialog.component';
-import { AnnonceCardComponent } from '../../../home/components/annonce-card/annonce-card.component';
-import { FilterPipe } from '../../../../shared/pipes/filter.pipe';
+import { EditProfileModalComponent } from '../../components/edit-profile-modal/edit-profile-modal.component';
 
 @Component({
   selector: 'app-profile-page',
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatDialogModule,
-    MatTabsModule,
-    ProfileInfoComponent,
-    AnnonceCardComponent,
-    FilterPipe
+    RouterModule,
+    EditProfileModalComponent
   ],
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.scss']
 })
 export class ProfilePageComponent implements OnInit {
-  currentUser: any = null;
-  userAnnonces: AnnonceResponse[] = [];
+  user: any = null;
+  myAnnonces: AnnonceResponse[] = [];
   loading = true;
+  showEditModal = false;
+  saving = false;
 
   constructor(
     private authService: AuthService,
     private annonceService: AnnonceService,
-    private router: Router,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private router: Router
   ) {
-    // Vérifier si l'utilisateur est connecté (appel de fonction signal)
-    if (!this.authService.isAuthenticated()) {
-      this.snackBar.open('Vous devez être connecté pour voir votre profil', 'Fermer', {
-        duration: 5000,
-        panelClass: ['error-snackbar']
-      });
+    // Récupérer l'utilisateur connecté
+    this.user = this.authService.currentUser();
+    
+    if (!this.user) {
       this.router.navigate(['/auth/login']);
     }
   }
 
   ngOnInit(): void {
-    // Récupérer l'utilisateur via signal
-    const user = this.authService.currentUser();
-    
-    if (user) {
-      this.currentUser = user;
-      this.loadUserAnnonces();
-    } else {
-      this.router.navigate(['/auth/login']);
-    }
-    
-    this.loading = false;
+    this.loadUserData();
   }
 
-  loadUserAnnonces(): void {
+  loadUserData(): void {
+    this.loading = true;
+    
+    // Charger les annonces de l'utilisateur
     this.annonceService.loadMyAnnonces().subscribe({
       next: () => {
-        this.userAnnonces = this.annonceService.myAnnonces();
+        this.myAnnonces = this.annonceService.myAnnonces();
+        this.loading = false;
       },
-      error: (err: any) => {
-        console.error('Erreur lors du chargement des annonces:', err);
+      error: (err) => {
+        console.error('Erreur chargement annonces:', err);
+        this.loading = false;
       }
     });
   }
 
-  getTotalViews(): number {
-    return this.userAnnonces.reduce((total, annonce) => total + annonce.nombreConsultations, 0);
+  openEditModal(): void {
+    this.showEditModal = true;
   }
 
-  onEditProfile(): void {
-    if (!this.currentUser) return;
-
-    const dialogRef = this.dialog.open(EditProfileDialogComponent, {
-      width: '600px',
-      data: { user: this.currentUser }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.updateProfile(result);
-      }
-    });
+  closeEditModal(): void {
+    this.showEditModal = false;
   }
 
-  updateProfile(updatedUser: any): void {
-    // TODO: Implémenter updateProfile dans AuthService
-    console.log('Update profile:', updatedUser);
-    this.currentUser = { ...this.currentUser, ...updatedUser };
-    this.showSuccess('Profil mis à jour avec succès !');
+  saveProfile(profileData: any): void {
+    this.saving = true;
     
-    /*
-    this.authService.updateProfile(updatedUser).subscribe({
-      next: (user: any) => {
-        this.currentUser = user;
-        this.showSuccess('Profil mis à jour avec succès !');
+    this.authService.updateProfile(profileData).subscribe({
+      next: () => {
+        // Mettre à jour l'utilisateur local
+        this.user = this.authService.currentUser();
+        this.showEditModal = false;
+        this.saving = false;
+        this.showSuccessToast('Profil mis à jour avec succès !');
       },
-      error: (err: any) => {
-        console.error('Erreur lors de la mise à jour:', err);
-        this.showError('Erreur lors de la mise à jour du profil');
+      error: (err) => {
+        console.error('Erreur mise à jour profil:', err);
+        this.saving = false;
+        this.showErrorToast('Erreur lors de la mise à jour du profil');
       }
     });
-    */
   }
 
-  goToMesAnnonces(): void {
-    this.router.navigate(['/annonces/mes-annonces']);
+  get activeAnnoncesCount(): number {
+    return this.myAnnonces.filter(a => a.active).length;
   }
 
-  goToCreateAnnonce(): void {
-    this.router.navigate(['/annonces/create']);
+  get inactiveAnnoncesCount(): number {
+    return this.myAnnonces.filter(a => !a.active).length;
   }
 
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['success-snackbar']
-    });
+  // Toast Tailwind simple
+  private showSuccessToast(message: string): void {
+    this.showToast(message, 'success');
   }
 
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 5000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['error-snackbar']
-    });
+  private showErrorToast(message: string): void {
+    this.showToast(message, 'error');
+  }
+
+  private showToast(message: string, type: 'success' | 'error'): void {
+    // Créer un élément toast
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform translate-x-0 ${
+      type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    // Animation d'entrée
+    setTimeout(() => {
+      toast.classList.add('opacity-100');
+    }, 10);
+    
+    // Retirer après 3 secondes
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-full');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   }
 }

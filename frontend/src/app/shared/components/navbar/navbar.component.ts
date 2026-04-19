@@ -8,6 +8,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDivider } from '@angular/material/divider';
 import { AuthService } from '@app/core/services/auth.service';
+import { MessageService } from '../../../core/services/message.service';
 
 @Component({
   selector: 'app-navbar',
@@ -28,10 +29,12 @@ import { AuthService } from '@app/core/services/auth.service';
 export class NavbarComponent {
   isAuthenticated = false;
   currentUser: any = null;
+  unreadCount = 0;
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private messageService: MessageService
   ) {
     // Utiliser effect pour réagir aux changements du signal d'authentification
     effect(() => {
@@ -40,6 +43,26 @@ export class NavbarComponent {
       this.currentUser = user;
       
       console.log('🔄 Navbar updated - User:', user ? user.email : 'none');
+      
+      // Charger les messages non lus si connecté
+      if (user) {
+        this.loadUnreadCount();
+      } else {
+        this.unreadCount = 0;
+      }
+    });
+  }
+
+  loadUnreadCount(): void {
+    this.messageService.loadUnreadMessages().subscribe({
+      next: () => {
+        this.unreadCount = this.messageService.unreadMessages().length;
+        console.log('📧 Messages non lus:', this.unreadCount);
+      },
+      error: (err) => {
+        console.error('Erreur chargement messages non lus:', err);
+        this.unreadCount = 0;
+      }
     });
   }
 

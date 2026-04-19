@@ -82,4 +82,13 @@ export class MessageService {
       })
     );
   }
+  
+  getUnreadCount(): number { return this.unreadMessagesSignal().length; }
 }
+
+
+
+
+
+
+

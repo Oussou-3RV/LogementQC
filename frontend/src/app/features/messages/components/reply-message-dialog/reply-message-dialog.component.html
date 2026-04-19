@@ -1,0 +1,113 @@
+<div class="w-full  bg-white rounded-2xl shadow-xl overflow-hidden">
+
+  <!-- Header -->
+  <div class="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-indigo-500 to-blue-500">
+    <h2 class="text-xl font-semibold text-white flex items-center">
+      <span class="bg-white/20 p-2 rounded-lg mr-3">↩</span>
+      Répondre au message
+    </h2>
+  </div>
+
+  <!-- Content -->
+  <div class="p-6 space-y-6">
+
+    <!-- Message original -->
+    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+      <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">
+        Message original
+      </p>
+      <p class="text-gray-900 font-semibold">
+        {{ data.originalMessage.sujet }}
+      </p>
+      <p class="text-gray-600 text-sm italic line-clamp-3">
+        {{ data.originalMessage.contenu }}
+      </p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="replyForm" class="space-y-5">
+
+      <!-- Sujet -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Sujet
+        </label>
+        <div class="relative">
+          <input
+            type="text"
+            formControlName="sujet"
+            placeholder="Re: Votre message"
+            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+          />
+        </div>
+
+        <p *ngIf="replyForm.get('sujet')?.hasError('required')" 
+           class="text-red-500 text-xs mt-1">
+          Le sujet est obligatoire
+        </p>
+        <p *ngIf="replyForm.get('sujet')?.hasError('minlength')" 
+           class="text-red-500 text-xs mt-1">
+          Minimum 5 caractères
+        </p>
+      </div>
+
+      <!-- Message -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Votre message
+        </label>
+        <textarea
+          formControlName="contenu"
+          rows="5"
+          placeholder="Écrivez votre réponse ici..."
+          class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition resize-none"
+        ></textarea>
+
+        <div class="flex justify-between mt-1">
+          <div>
+            <p *ngIf="replyForm.get('contenu')?.hasError('required')" 
+               class="text-red-500 text-xs">
+              Le message est obligatoire
+            </p>
+            <p *ngIf="replyForm.get('contenu')?.hasError('minlength')" 
+               class="text-red-500 text-xs">
+              Minimum 20 caractères
+            </p>
+          </div>
+
+          <span class="text-xs text-gray-400">
+            {{ replyForm.get('contenu')?.value?.length || 0 }} / 20
+          </span>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Actions -->
+  <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+
+    <button
+      (click)="onCancel()"
+      class="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-200 transition"
+    >
+      Annuler
+    </button>
+
+    <button
+      (click)="onSend()"
+      [disabled]="!replyForm.valid || loading"
+      class="px-5 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 active:scale-95 transition flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <span *ngIf="!loading" class="flex items-center gap-2">
+        ➤ Envoyer
+      </span>
+
+      <span *ngIf="loading" class="flex items-center gap-2">
+        <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+        Envoi...
+      </span>
+    </button>
+
+  </div>
+</div>

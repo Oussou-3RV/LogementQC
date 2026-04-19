@@ -1,28 +1,65 @@
-<!-- Loader -->
-@if (loading) {
-  <div class="flex justify-center items-center py-12">
-    <mat-spinner></mat-spinner>
-  </div>
-}
-
-<!-- Liste vide -->
-@if (!loading && annonces.length === 0) {
-  <div class="text-center py-12">
-    <mat-icon class="text-6xl text-gray-400 mb-4 !h-14 !w-14">home_work</mat-icon>
-    <h3 class="text-xl text-gray-600 mb-2">Aucune annonce trouvée</h3>
-    <p class="text-gray-500">Essayez de modifier vos critères de recherche</p>
-  </div>
-}
-
-<!-- Grille d'annonces -->
-@if (!loading && annonces.length > 0) {
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div 
+    *ngFor="let annonce of annonces" 
+    class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+    [routerLink]="['/annonces', annonce.id]">
     
-    @for (annonce of annonces; track annonce.id) {
-      <app-annonce-card
-        [annonce]="annonce">
-      </app-annonce-card>
-    }
+    <!-- Image -->
+    <div class="aspect-[4/3] bg-gray-100 overflow-hidden">
+      <img 
+        *ngIf="annonce.photos && annonce.photos.length > 0"
+        [src]="annonce.photos[0]" 
+        [alt]="annonce.titre"
+        class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
+      <div 
+        *ngIf="!annonce.photos || annonce.photos.length === 0"
+        class="w-full h-full flex items-center justify-center">
+        <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Contenu -->
+    <div class="p-4">
+      <!-- Prix -->
+      <div class="text-2xl font-semibold text-gray-900 mb-2">
+        {{ annonce.montantMensuel }} $
+        <span class="text-sm font-normal text-gray-600">/mois</span>
+      </div>
+
+      <!-- Titre -->
+      <h3 class="font-medium text-gray-900 mb-2 line-clamp-1">
+        {{ annonce.titre }}
+      </h3>
+
+      <!-- Localisation -->
+      <p class="text-sm text-gray-600 mb-3 flex items-center">
+        <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        {{ annonce.adresse.ville }}, {{ annonce.adresse.province }}
+      </p>
+
+      <!-- Description courte -->
+      <p class="text-sm text-gray-600 line-clamp-2 mb-3">
+        {{ annonce.descriptionCourte }}
+      </p>
+
+      <!-- Footer -->
+      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+        <span class="text-xs text-gray-500 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          {{ formatDate(annonce.dateDisponibilite) }}
+        </span>
+        <span class="text-xs text-gray-400">
+          {{ annonce.nombreConsultations }} vues
+        </span>
+      </div>
+    </div>
 
   </div>
-}
+</div>

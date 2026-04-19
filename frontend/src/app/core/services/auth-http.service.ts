@@ -38,6 +38,17 @@ export interface AuthResponse {
   };
 }
 
+export interface UpdateProfileRequest {
+  nom?: string;
+  prenom?: string;
+  telephone?: string;
+  rue?: string;
+  ville?: string;
+  province?: string;
+  codePostal?: string;
+  pays?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -54,6 +65,10 @@ export class AuthHttpService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request);
   }
 
+  updateProfile(request: UpdateProfileRequest): Observable<{ id: string; email: string; nom: string; prenom: string; telephone: string; rue: string; ville: string; province: string; codePostal: string; pays: string; }> {
+    return this.http.put<any>(`${this.apiUrl}/profile`, request);
+  }
+  
   getCurrentUser(): Observable<any> {
     return this.http.get(`${this.apiUrl}/me`);
   }

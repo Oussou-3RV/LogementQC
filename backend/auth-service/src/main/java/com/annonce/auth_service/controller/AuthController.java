@@ -1,5 +1,6 @@
 package com.annonce.auth_service.controller;
 
+import com.annonce.auth_service.dto.request.UpdateProfileRequest;
 import com.annonce.auth_service.dto.request.ForgotPasswordRequest;
 import com.annonce.auth_service.dto.request.LoginRequest;
 import com.annonce.auth_service.dto.request.RegisterRequest;
@@ -43,6 +44,16 @@ public class AuthController {
     public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         log.info("POST /api/auth/forgot-password - Password reset request");
         MessageResponse response = authService.forgotPassword(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserResponse> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody UpdateProfileRequest request) {
+        log.info("PUT /api/auth/profile - Update user profile");
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserResponse response = authService.updateProfile(userDetails.getUsername(), request);
         return ResponseEntity.ok(response);
     }
 

@@ -7,6 +7,7 @@ import { ProfilePageComponent } from './features/profile/pages/profile-page/prof
 import { LoginComponent } from './features/auth/pages/login/login.component';
 import { RegisterComponent } from './features/auth/pages/register/register.component';
 import { ForgotPasswordComponent } from './features/auth/pages/forgot-password/forgot-password.component';
+import { MessagesPageComponent } from './features/messages/pages/messages-page/messages-page.component';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,10 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: ProfilePageComponent
+  },
+  {
+    path: 'messages',
+    component: MessagesPageComponent
   },
   {
     path: '**',

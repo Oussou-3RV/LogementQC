@@ -1,59 +1,68 @@
-<div class="shadow-md  bg-white shadow-lg">
-    <div class="container mx-auto flex items-center justify-between p-4">
-      <!-- Logo et titre -->
-      <div class="flex items-center space-x-2 cursor-pointer" (click)="navigateTo('/')">
-        <mat-icon>home</mat-icon>
-        <span class="text-xl font-bold">Annonces Logement</span>
-      </div>
-  
-      <!-- Navigation -->
-      <nav class="hidden  md:flex space-x-4">
-        <button  mat-button (click)="navigateTo('/')">
-          <mat-icon class="text-black">search</mat-icon>
-          <span class="text-black">Annonces</span>
+<div class="shadow-md bg-white shadow-lg">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <!-- Logo et titre -->
+    <div class="flex items-center space-x-2 cursor-pointer" (click)="navigateTo('/')">
+      <mat-icon>home</mat-icon>
+      <span class="text-xl font-bold">Annonces Logement</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="hidden md:flex space-x-4">
+      <button mat-button (click)="navigateTo('/')">
+        <mat-icon class="text-black">search</mat-icon>
+        <span class="text-black">Annonces</span>
+      </button>
+      
+      <button mat-button (click)="navigateTo('/annonces/create')" *ngIf="isAuthenticated">
+        <mat-icon class="text-green-800">add_circle</mat-icon>
+        <span class="text-green-800">Publier</span>
+      </button>
+    </nav>
+
+    <!-- Actions utilisateur -->
+    <div class="flex items-center space-x-2">
+      <ng-container *ngIf="!isAuthenticated">
+        <button mat-button (click)="navigateTo('/auth/login')" class="">
+          Connexion
         </button>
-        
-        <button mat-button (click)="navigateTo('/annonces/create')" *ngIf="isAuthenticated">
-          <mat-icon class="text-green-800">add_circle</mat-icon>
-          <span class="text-green-800">Publier</span>
+        <button mat-raised-button color="accent" routerLink="/auth/register">
+          Inscription
         </button>
-      </nav>
-  
-      <!-- Actions utilisateur -->
-      <div class="flex items-center space-x-2">
-        <ng-container *ngIf="!isAuthenticated">
-          <button mat-button (click)="navigateTo('/auth/login')" class="">
-            Connexion
+      </ng-container>
+
+      <ng-container *ngIf="isAuthenticated">
+        <button mat-icon-button [matMenuTriggerFor]="userMenu">
+          <mat-icon class="text-black">account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigateTo('/profile')">
+            <mat-icon>person</mat-icon>
+            <span>Mon Profil</span>
           </button>
-          <button mat-raised-button color="accent" routerLink="/auth/register">
-            Inscription
+          <button mat-menu-item (click)="navigateTo('annonces/mes-annonces')">
+            <mat-icon>list</mat-icon>
+            <span>Mes Annonces</span>
           </button>
-        </ng-container>
-  
-        <ng-container *ngIf="isAuthenticated">
-          <button mat-icon-button [matMenuTriggerFor]="userMenu">
-            <mat-icon class="text-black">account_circle</mat-icon>
+          <button mat-menu-item (click)="navigateTo('/messages')">
+            <mat-icon 
+              [matBadge]="unreadCount > 0 ? unreadCount : null" 
+              matBadgeColor="warn"
+              [matBadgeHidden]="unreadCount === 0">
+              mail
+            </mat-icon>
+            <span>Messages</span>
+            <span *ngIf="unreadCount > 0" 
+                  class="ml-2 bg-orange-500 text-white rounded-full px-2 py-1 text-xs">
+              {{ unreadCount }}
+            </span>
           </button>
-          <mat-menu #userMenu="matMenu">
-            <button mat-menu-item (click)="navigateTo('/profile')">
-              <mat-icon>person</mat-icon>
-              <span>Mon Profil</span>
-            </button>
-            <button mat-menu-item (click)="navigateTo('annonces/mes-annonces')">
-              <mat-icon>list</mat-icon>
-              <span>Mes Annonces</span>
-            </button>
-            <button mat-menu-item (click)="navigateTo('/messages')">
-              <mat-icon matBadge="3" matBadgeColor="warn">mail</mat-icon>
-              <span>Messages</span>
-            </button>
-            <mat-divider></mat-divider>
-            <button mat-menu-item (click)="logout()">
-              <mat-icon>logout</mat-icon>
-              <span>Déconnexion</span>
-            </button>
-          </mat-menu>
-        </ng-container>
-      </div>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Déconnexion</span>
+          </button>
+        </mat-menu>
+      </ng-container>
     </div>
   </div>
+</div>

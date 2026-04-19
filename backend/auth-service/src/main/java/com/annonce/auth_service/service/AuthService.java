@@ -1,5 +1,5 @@
 package com.annonce.auth_service.service;
-
+import com.annonce.auth_service.dto.request.UpdateProfileRequest;
 import com.annonce.auth_service.dto.request.ForgotPasswordRequest;
 import com.annonce.auth_service.dto.request.LoginRequest;
 import com.annonce.auth_service.dto.request.RegisterRequest;
@@ -119,6 +119,45 @@ public class AuthService {
         return MessageResponse.builder()
                 .message("Un email de réinitialisation a été envoyé à " + request.getEmail())
                 .build();
+    }
+
+    @Transactional
+    public UserResponse updateProfile(String email, UpdateProfileRequest request) {
+        log.info("Updating profile for user: {}", email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé"));
+
+        // Mettre à jour uniquement les champs non-null
+        if (request.getNom() != null) {
+            user.setNom(request.getNom());
+        }
+        if (request.getPrenom() != null) {
+            user.setPrenom(request.getPrenom());
+        }
+        if (request.getTelephone() != null) {
+            user.setTelephone(request.getTelephone());
+        }
+        if (request.getRue() != null) {
+            user.setRue(request.getRue());
+        }
+        if (request.getVille() != null) {
+            user.setVille(request.getVille());
+        }
+        if (request.getProvince() != null) {
+            user.setProvince(request.getProvince());
+        }
+        if (request.getCodePostal() != null) {
+            user.setCodePostal(request.getCodePostal());
+        }
+        if (request.getPays() != null) {
+            user.setPays(request.getPays());
+        }
+
+        User updatedUser = userRepository.save(user);
+        log.info("Profile updated for user: {}", updatedUser.getEmail());
+
+        return mapToUserResponse(updatedUser);
     }
 
     @Transactional(readOnly = true)

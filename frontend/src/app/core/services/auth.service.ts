@@ -1,7 +1,7 @@
 import { Injectable, signal, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { AuthHttpService, RegisterRequest, LoginRequest, AuthResponse } from './auth-http.service';
+import { AuthHttpService, RegisterRequest, LoginRequest, AuthResponse, UpdateProfileRequest } from './auth-http.service';
 import { catchError, tap, throwError } from 'rxjs';
 
 interface User {
@@ -86,6 +86,28 @@ export class AuthService {
     return this.authHttp.getCurrentUser().pipe(
       tap(() => {
         console.log('Forgot password for:', email);
+      })
+    );
+  }
+
+  updateProfile(profileData: UpdateProfileRequest) {
+    return this.authHttp.updateProfile(profileData).pipe(
+      tap((updatedUser) => {
+        // Mettre à jour le localStorage et le signal
+        const currentUser = this.currentUserSignal();
+        if (currentUser) {
+          const newUser = { ...currentUser, ...updatedUser };
+          
+          if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('current_user', JSON.stringify(newUser));
+          }
+          
+          this.currentUserSignal.set(newUser);
+        }
+      }),
+      catchError((error) => {
+        console.error('Update profile error:', error);
+        return throwError(() => error);
       })
     );
   }

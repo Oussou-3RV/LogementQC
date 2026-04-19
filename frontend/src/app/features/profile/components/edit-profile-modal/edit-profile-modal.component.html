@@ -1,0 +1,187 @@
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" (click)="onCancel()">
+  
+    <!-- Modal -->
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden" (click)="$event.stopPropagation()">
+      
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-bold text-white flex items-center">
+            <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Modifier mon profil
+          </h2>
+          <button (click)="onCancel()" class="text-white hover:text-gray-200 transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+  
+      <!-- Body -->
+      <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+        <form [formGroup]="profileForm" class="space-y-5">
+          
+          <!-- Informations personnelles -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              Informations personnelles
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Prénom -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+                <input 
+                  type="text" 
+                  formControlName="prenom"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  [class.border-red-500]="profileForm.get('prenom')?.invalid && profileForm.get('prenom')?.touched"
+                  placeholder="John">
+                <p *ngIf="profileForm.get('prenom')?.invalid && profileForm.get('prenom')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                  Le prénom est obligatoire (min. 2 caractères)
+                </p>
+              </div>
+  
+              <!-- Nom -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+                <input 
+                  type="text" 
+                  formControlName="nom"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  [class.border-red-500]="profileForm.get('nom')?.invalid && profileForm.get('nom')?.touched"
+                  placeholder="Doe">
+                <p *ngIf="profileForm.get('nom')?.invalid && profileForm.get('nom')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                  Le nom est obligatoire (min. 2 caractères)
+                </p>
+              </div>
+  
+              <!-- Téléphone -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+                <input 
+                  type="tel" 
+                  formControlName="telephone"
+                  (input)="formatPhoneNumber($event)"
+                  maxlength="12"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  [class.border-red-500]="profileForm.get('telephone')?.invalid && profileForm.get('telephone')?.touched"
+                  placeholder="514-555-0123">
+                <p *ngIf="profileForm.get('telephone')?.invalid && profileForm.get('telephone')?.touched" 
+                   class="mt-1 text-sm text-red-600">
+                  Format requis: 514-555-0123
+                </p>
+              </div>
+            </div>
+          </div>
+  
+          <!-- Adresse -->
+          <div class="pt-4 border-t border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              Adresse
+            </h3>
+  
+            <div class="space-y-4">
+              <!-- Rue -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rue</label>
+                <input 
+                  type="text" 
+                  formControlName="rue"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  placeholder="123 Rue Example">
+              </div>
+  
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Ville -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Ville</label>
+                  <input 
+                    type="text" 
+                    formControlName="ville"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    placeholder="Montreal">
+                </div>
+  
+                <!-- Province -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Province</label>
+                  <input 
+                    type="text" 
+                    formControlName="province"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    placeholder="QC">
+                </div>
+              </div>
+  
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Code Postal -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Code Postal</label>
+                  <input 
+                    type="text" 
+                    formControlName="codePostal"
+                    (input)="formatPostalCode($event)"
+                    maxlength="7"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    [class.border-red-500]="profileForm.get('codePostal')?.invalid && profileForm.get('codePostal')?.touched"
+                    placeholder="H1A 1A1">
+                  <p *ngIf="profileForm.get('codePostal')?.invalid && profileForm.get('codePostal')?.touched" 
+                     class="mt-1 text-sm text-red-600">
+                    Format: A1A 1A1
+                  </p>
+                </div>
+  
+                <!-- Pays -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Pays</label>
+                  <input 
+                    type="text" 
+                    formControlName="pays"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    placeholder="Canada">
+                </div>
+              </div>
+            </div>
+          </div>
+  
+        </form>
+      </div>
+  
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 border-t border-gray-200">
+        <button 
+          type="button"
+          (click)="onCancel()"
+          class="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100 transition-colors">
+          Annuler
+        </button>
+        <button 
+          type="button"
+          (click)="onSave()"
+          [disabled]="!profileForm.valid || loading"
+          class="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center">
+          <svg *ngIf="loading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span *ngIf="!loading">Enregistrer</span>
+          <span *ngIf="loading">Enregistrement...</span>
+        </button>
+      </div>
+  
+    </div>
+  </div>
