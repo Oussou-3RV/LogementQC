@@ -1,105 +1,130 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, signal, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { User } from '../../shared/models/user.model';
+import { Router } from '@angular/router';
+import { AuthHttpService, RegisterRequest, LoginRequest, AuthResponse } from './auth-http.service';
+import { catchError, tap, throwError } from 'rxjs';
+
+interface User {
+  id: string;
+  email: string;
+  nom: string;
+  prenom: string;
+  telephone: string;
+  rue: string;
+  ville: string;
+  province: string;
+  codePostal: string;
+  pays: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  
-  private currentUserSubject: BehaviorSubject<User | null>;
-  public currentUser$: Observable<User | null>;
-  private isBrowser: boolean;
+  private currentUserSignal = signal<User | null>(null);
+  private isAuthenticatedSignal = signal<boolean>(false);
+  private platformId = inject(PLATFORM_ID);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
+  currentUser = this.currentUserSignal.asReadonly();
+  isAuthenticated = this.isAuthenticatedSignal.asReadonly();
+
+  constructor(
+    private authHttp: AuthHttpService,
+    private router: Router
+  ) {
+    // Vérifier si un token existe au démarrage
+    this.checkStoredAuth();
+  }
+
+  private checkStoredAuth(): void {
+    // Vérifier si on est dans le navigateur
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const token = localStorage.getItem('auth_token');
+    const userStr = localStorage.getItem('current_user');
+
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        this.currentUserSignal.set(user);
+        this.isAuthenticatedSignal.set(true);
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        this.logout();
+      }
+    }
+  }
+
+  register(registerData: RegisterRequest) {
+    return this.authHttp.register(registerData).pipe(
+      tap((response: AuthResponse) => {
+        this.handleAuthSuccess(response);
+      }),
+      catchError((error) => {
+        console.error('Registration error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  login(loginData: LoginRequest) {
+    return this.authHttp.login(loginData).pipe(
+      tap((response: AuthResponse) => {
+        this.handleAuthSuccess(response);
+      }),
+      catchError((error) => {
+        console.error('Login error:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  forgotPassword(email: string) {
+    // TODO: Implémenter avec le backend
+    return this.authHttp.getCurrentUser().pipe(
+      tap(() => {
+        console.log('Forgot password for:', email);
+      })
+    );
+  }
+
+  private handleAuthSuccess(response: AuthResponse): void {
+    // Vérifier si on est dans le navigateur
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    // Stocker le token
+    localStorage.setItem('auth_token', response.token);
     
-    // Récupérer l'utilisateur du localStorage si existe (seulement côté navigateur)
-    let storedUser = null;
-    if (this.isBrowser) {
-      const userJson = localStorage.getItem('currentUser');
-      storedUser = userJson ? JSON.parse(userJson) : null;
-    }
+    // Stocker l'utilisateur
+    localStorage.setItem('current_user', JSON.stringify(response.user));
     
-    this.currentUserSubject = new BehaviorSubject<User | null>(storedUser);
-    this.currentUser$ = this.currentUserSubject.asObservable();
+    // Mettre à jour les signals
+    this.currentUserSignal.set(response.user);
+    this.isAuthenticatedSignal.set(true);
   }
 
-  public get currentUserValue(): User | null {
-    return this.currentUserSubject.value;
-  }
-
-  public get isAuthenticated(): boolean {
-    return !!this.currentUserValue;
-  }
-
-  // Login (mock pour Jalon I)
-  login(email: string, password: string): Observable<User> {
-    // Simulation d'un utilisateur connecté
-    const mockUser: User = {
-      id: 'user-' + Math.random().toString(36).substr(2, 9),
-      email: email,
-      nom: 'Doe',
-      prenom: 'John',
-      telephone: '514-555-0123',
-      adresse: {
-        rue: '123 Rue Example',
-        ville: 'Montréal',
-        province: 'QC',
-        codePostal: 'H1A 1A1',
-        pays: 'Canada'
-      },
-      createdAt: new Date()
-    };
-
-    // Stocker dans localStorage (seulement côté navigateur)
-    if (this.isBrowser) {
-      localStorage.setItem('currentUser', JSON.stringify(mockUser));
-    }
-    this.currentUserSubject.next(mockUser);
-
-    return of(mockUser).pipe(delay(1000)); // Simule un délai réseau
-  }
-
-  // Register (mock pour Jalon I)
-  register(user: Omit<User, 'id' | 'createdAt'>): Observable<User> {
-    const newUser: User = {
-      ...user,
-      id: 'user-' + Math.random().toString(36).substr(2, 9),
-      createdAt: new Date()
-    };
-
-    // Auto-login après inscription (seulement côté navigateur)
-    if (this.isBrowser) {
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-    }
-    this.currentUserSubject.next(newUser);
-
-    return of(newUser).pipe(delay(1000));
-  }
-
-  // Logout
   logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem('currentUser');
+    // Vérifier si on est dans le navigateur
+    if (isPlatformBrowser(this.platformId)) {
+      // Nettoyer le localStorage
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('current_user');
     }
-    this.currentUserSubject.next(null);
+    
+    // Réinitialiser les signals
+    this.currentUserSignal.set(null);
+    this.isAuthenticatedSignal.set(false);
+    
+    // Rediriger vers la page de connexion
+    this.router.navigate(['/auth/login']);
   }
 
-  // Forgot password (mock pour Jalon I)
-  forgotPassword(email: string): Observable<{ message: string }> {
-    console.log('Reset password email sent to:', email);
-    return of({ message: 'Email de réinitialisation envoyé' }).pipe(delay(1000));
-  }
-
-  // Update profile
-  updateProfile(user: User): Observable<User> {
-    if (this.isBrowser) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
-    }
-    this.currentUserSubject.next(user);
-    return of(user).pipe(delay(500));
+  getCurrentUserId(): string | null {
+    const user = this.currentUserSignal();
+    return user ? user.id : null;
   }
 }

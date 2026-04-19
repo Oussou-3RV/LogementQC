@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { Annonce } from '@app/shared/models/annonce.model';
+import { AnnonceResponse } from '../../../../core/services/annonce-http.service';
 import { AnnonceCardComponent } from '../annonce-card/annonce-card.component';
 
 @Component({
@@ -18,6 +19,6 @@ import { AnnonceCardComponent } from '../annonce-card/annonce-card.component';
   styleUrls: ['./annonce-list.component.scss']
 })
 export class AnnonceListComponent {
-  @Input() annonces: Annonce[] = [];
+  @Input() annonces: AnnonceResponse[] = [];
   @Input() loading = false;
 }

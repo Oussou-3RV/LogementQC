@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import {  Annonce } from '@app/shared/models/annonce.model'
+import { AnnonceResponse } from '../../../../core/services/annonce-http.service';
+
 
 @Component({
   selector: 'app-annonce-card',
@@ -21,7 +23,7 @@ import {  Annonce } from '@app/shared/models/annonce.model'
   styleUrls: ['./annonce-card.component.scss']
 })
 export class AnnonceCardComponent {
-  @Input() annonce!: Annonce;
+  @Input() annonce!: AnnonceResponse;
 
   constructor(private router: Router) {}
 

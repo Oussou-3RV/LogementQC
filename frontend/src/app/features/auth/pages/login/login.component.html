@@ -19,10 +19,10 @@
               placeholder="votre@email.com"
             />
             <mat-icon matPrefix>email</mat-icon>
-            <mat-error *ngIf="submitted && f['email'].errors?.['required']">
+            <mat-error *ngIf="f['email'].errors?.['required']">
               L'email est obligatoire
             </mat-error>
-            <mat-error *ngIf="submitted && f['email'].errors?.['email']">
+            <mat-error *ngIf="f['email'].errors?.['email']">
               Veuillez entrer un email valide
             </mat-error>
           </mat-form-field>
@@ -45,10 +45,10 @@
             >
               <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
             </button>
-            <mat-error *ngIf="submitted && f['password'].errors?.['required']">
+            <mat-error *ngIf="f['password'].errors?.['required']">
               Le mot de passe est obligatoire
             </mat-error>
-            <mat-error *ngIf="submitted && f['password'].errors?.['minlength']">
+            <mat-error *ngIf="f['password'].errors?.['minlength']">
               Le mot de passe doit contenir au moins 6 caractères
             </mat-error>
           </mat-form-field>

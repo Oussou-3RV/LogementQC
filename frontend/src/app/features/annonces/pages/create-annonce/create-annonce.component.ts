@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,7 +15,6 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatStepperModule } from '@angular/material/stepper';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AnnonceService } from '../../../../core/services/annonce.service';
-import { Annonce } from '@app/shared/models/annonce.model';
 
 @Component({
   selector: 'app-create-annonce',
@@ -52,8 +51,8 @@ export class CreateAnnonceComponent implements OnInit {
     private router: Router,
     private snackBar: MatSnackBar
   ) {
-    // Vérifier si l'utilisateur est connecté
-    if (!this.authService.isAuthenticated) {
+    // Vérifier si l'utilisateur est connecté (appel de fonction signal)
+    if (!this.authService.isAuthenticated()) {
       this.snackBar.open('Vous devez être connecté pour publier une annonce', 'Fermer', {
         duration: 5000,
         panelClass: ['error-snackbar']
@@ -108,66 +107,77 @@ export class CreateAnnonceComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.basicInfoForm.invalid || this.addressForm.invalid) {
-      this.snackBar.open('Veuillez remplir tous les champs obligatoires', 'Fermer', {
-        duration: 5000,
-        panelClass: ['error-snackbar']
-      });
-      return;
-    }
+    // Vérifier que tous les formulaires sont valides
+    if (this.basicInfoForm.valid && this.addressForm.valid) {
+      this.loading = true;
+      const currentUser = this.authService.currentUser();
   
-    if (this.photoUrls.length === 0) {
-      this.snackBar.open('Veuillez ajouter au moins une photo', 'Fermer', {
-        duration: 5000,
-        panelClass: ['error-snackbar']
-      });
-      return;
-    }
+      if (!currentUser) {
+        this.showError('Vous devez être connecté');
+        this.router.navigate(['/auth/login']);
+        this.loading = false;
+        return;
+      }
+
+      // Vérifier qu'il y a au moins une photo
+      if (this.photoUrls.length === 0) {
+        this.showError('Veuillez ajouter au moins une photo');
+        this.loading = false;
+        return;
+      }
+
+      // Formater la date pour l'API (YYYY-MM-DD)
+      const dateDisponibilite = this.basicInfoForm.value.dateDisponibilite;
+      const formattedDate = dateDisponibilite instanceof Date 
+        ? dateDisponibilite.toISOString().split('T')[0] 
+        : dateDisponibilite;
   
-    this.loading = true;
-  
-    const currentUser = this.authService.currentUserValue;
-    if (!currentUser) {
-      this.router.navigate(['/auth/login']);
-      return;
-    }
-  
-    const newAnnonce: Omit<Annonce, 'id' | 'createdAt' | 'updatedAt'> = {
-      titre: this.basicInfoForm.value.titre,
-      descriptionCourte: this.basicInfoForm.value.descriptionCourte,
-      descriptionLongue: this.basicInfoForm.value.descriptionLongue,
-      montantMensuel: parseFloat(this.basicInfoForm.value.montantMensuel),
-      dateDisponibilite: new Date(this.basicInfoForm.value.dateDisponibilite),
-      photos: this.photoUrls,
-      adresse: {
+      const newAnnonce = {
+        titre: this.basicInfoForm.value.titre,
+        descriptionCourte: this.basicInfoForm.value.descriptionCourte,
+        descriptionLongue: this.basicInfoForm.value.descriptionLongue,
+        montantMensuel: parseFloat(this.basicInfoForm.value.montantMensuel),
+        dateDisponibilite: formattedDate,
+        photos: this.photoUrls,
         rue: this.addressForm.value.rue,
         ville: this.addressForm.value.ville,
         province: this.addressForm.value.province,
         codePostal: this.addressForm.value.codePostal,
         pays: this.addressForm.value.pays
-      },
-      userId: currentUser.id!,
-      nombreConsultations: 0,
-      active: true
-    };
+      };
   
-    // Utiliser le service pour créer l'annonce
-    this.annonceService.createAnnonce(newAnnonce).subscribe({
-      next: (createdAnnonce) => {
-        this.loading = false;
-        this.snackBar.open('Annonce publiée avec succès ! 🎉', 'Fermer', {
-          duration: 3000,
-          panelClass: ['success-snackbar']
-        });
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.snackBar.open('Erreur lors de la publication', 'Fermer', {
-          duration: 5000,
-          panelClass: ['error-snackbar']
-        });
-      }
+      this.annonceService.createAnnonce(newAnnonce).subscribe({
+        next: () => {
+          this.showSuccess('Annonce créée avec succès !');
+          this.router.navigate(['/annonces/mes-annonces']);
+        },
+        error: (err) => {
+          console.error('Erreur lors de la création:', err);
+          const errorMsg = err.error?.message || 'Erreur lors de la création de l\'annonce';
+          this.showError(errorMsg);
+          this.loading = false;
+        }
+      });
+    } else {
+      this.showError('Veuillez remplir tous les champs obligatoires');
+    }
+  }
+
+  private showSuccess(message: string): void {
+    this.snackBar.open(message, 'Fermer', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['success-snackbar']
+    });
+  }
+
+  private showError(message: string): void {
+    this.snackBar.open(message, 'Fermer', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['error-snackbar']
     });
   }
 }

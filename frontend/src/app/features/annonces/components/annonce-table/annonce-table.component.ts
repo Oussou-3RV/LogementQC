@@ -9,6 +9,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/divider';
 import { Annonce } from '../../../../shared/models/annonce.model';
+import { AnnonceResponse } from '../../../../core/services/annonce-http.service';
+
 
 @Component({
   selector: 'app-annonce-table',
@@ -27,7 +29,7 @@ import { Annonce } from '../../../../shared/models/annonce.model';
   styleUrls: ['./annonce-table.component.scss']
 })
 export class AnnonceTableComponent {
-  @Input() annonces: Annonce[] = [];
+  @Input() annonces: AnnonceResponse[] = [];
   @Output() toggleStatus = new EventEmitter<string>();
   @Output() edit = new EventEmitter<string>();
   @Output() delete = new EventEmitter<string>();

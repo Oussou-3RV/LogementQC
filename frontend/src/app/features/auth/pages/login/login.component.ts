@@ -32,8 +32,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 export class LoginComponent {
   loginForm: FormGroup;
   loading = false;
-  submitted = false;
   hidePassword = true;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -42,7 +42,7 @@ export class LoginComponent {
     private snackBar: MatSnackBar
   ) {
     // Rediriger si déjà connecté
-    if (this.authService.isAuthenticated) {
+    if (this.authService.isAuthenticated()) {
       this.router.navigate(['/']);
     }
 
@@ -57,34 +57,31 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    this.submitted = true;
-
-    if (this.loginForm.invalid) {
-      return;
+    if (this.loginForm.valid) {
+      this.loading = true;
+      this.errorMessage = '';
+  
+      const loginData = {
+        email: this.loginForm.value.email!,
+        password: this.loginForm.value.password!
+      };
+  
+      this.authService.login(loginData).subscribe({
+        next: () => {
+          console.log('Login successful');
+          this.snackBar.open('Connexion réussie !', 'Fermer', { duration: 3000 });
+          this.router.navigate(['/home']);
+        },
+        error: (error) => {
+          console.error('Login error:', error);
+          this.errorMessage = error.error?.message || 'Email ou mot de passe incorrect';
+          this.snackBar.open(this.errorMessage, 'Fermer', { duration: 5000 });
+          this.loading = false;
+        },
+        complete: () => {
+          this.loading = false;
+        }
+      });
     }
-
-    this.loading = true;
-    const { email, password } = this.loginForm.value;
-
-    this.authService.login(email, password).subscribe({
-      next: (user) => {
-        this.snackBar.open('Connexion réussie !', 'Fermer', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['success-snackbar']
-        });
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.snackBar.open('Erreur de connexion', 'Fermer', {
-          duration: 5000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
-      }
-    });
   }
 }

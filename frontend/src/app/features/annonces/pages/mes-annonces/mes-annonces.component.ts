@@ -11,6 +11,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { AnnonceService } from '../../../../core/services/annonce.service';
 import { Annonce } from '../../../../shared/models/annonce.model';
 import { AnnonceTableComponent } from '../../components/annonce-table/annonce-table.component';
+import { AnnonceResponse } from '../../../../core/services/annonce-http.service';
 
 @Component({
   selector: 'app-mes-annonces',
@@ -29,9 +30,9 @@ import { AnnonceTableComponent } from '../../components/annonce-table/annonce-ta
   styleUrls: ['./mes-annonces.component.scss']
 })
 export class MesAnnoncesComponent implements OnInit {
-  allAnnonces: Annonce[] = [];
-  activeAnnonces: Annonce[] = [];
-  inactiveAnnonces: Annonce[] = [];
+  allAnnonces: AnnonceResponse[] = [];
+  activeAnnonces: AnnonceResponse[] = [];
+  inactiveAnnonces: AnnonceResponse[] = [];
   loading = true;
 
   constructor(
@@ -56,24 +57,26 @@ export class MesAnnoncesComponent implements OnInit {
 
   loadMyAnnonces(): void {
     this.loading = true;
-    const currentUser = this.authService.currentUserValue;
-    
-    if (!currentUser?.id) {
+    const currentUser = this.authService.currentUser();
+  
+    if (!currentUser) {
+      this.showError('Vous devez être connecté');
       this.router.navigate(['/auth/login']);
       return;
     }
-
-    this.annonceService.getAnnoncesByUserId(currentUser.id).subscribe({
-      next: (annonces) => {
+  
+    this.annonceService.loadMyAnnonces().subscribe({
+      next: () => {
+        const annonces = this.annonceService.myAnnonces();
         this.allAnnonces = annonces;
-        this.activeAnnonces = annonces.filter(a => a.active);
-        this.inactiveAnnonces = annonces.filter(a => !a.active);
+        this.activeAnnonces = annonces.filter((a) => a.active);
+        this.inactiveAnnonces = annonces.filter((a) => !a.active);
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erreur lors du chargement des annonces:', err);
+        this.showError('Erreur lors du chargement');
         this.loading = false;
-        this.showError('Erreur lors du chargement de vos annonces');
       }
     });
   }

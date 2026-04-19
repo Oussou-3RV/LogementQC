@@ -4,6 +4,8 @@ import { Annonce } from '@app/shared/models/annonce.model'; // Chemin relatif
 import { AnnonceService } from '../../../../core/services/annonce.service'; // Chemin relatif
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 import { AnnonceListComponent } from '../../components/annonce-list/annonce-list.component';
+import { AnnonceResponse } from '../../../../core/services/annonce-http.service';
+
 
 @Component({
   selector: 'app-home-page',
@@ -17,7 +19,9 @@ import { AnnonceListComponent } from '../../components/annonce-list/annonce-list
   styleUrls: ['./home-page.component.scss']
 })
 export class HomePageComponent implements OnInit {
-  annonces: Annonce[] = [];
+  annonces: AnnonceResponse[] = [];
+filteredAnnonces: AnnonceResponse[] = [];
+
   loading = false;
 
   constructor(private annonceService: AnnonceService) {}
@@ -28,12 +32,13 @@ export class HomePageComponent implements OnInit {
 
   loadAnnonces(): void {
     this.loading = true;
-    this.annonceService.getAnnonces().subscribe({
-      next: (data) => {
-        this.annonces = data;
+    this.annonceService.loadActiveAnnonces().subscribe({
+      next: () => {
+        this.annonces = this.annonceService.annonces();
+        this.filteredAnnonces = [...this.annonces];
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erreur lors du chargement des annonces:', err);
         this.loading = false;
       }

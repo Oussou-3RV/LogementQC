@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -7,10 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDivider } from '@angular/material/divider';
-import { Subscription } from 'rxjs';
 import { AuthService } from '@app/core/services/auth.service';
-import { User } from '@app/shared/models/user.model';
-import { CdkStepLabel } from "@angular/cdk/stepper";
 
 @Component({
   selector: 'app-navbar',
@@ -24,30 +21,26 @@ import { CdkStepLabel } from "@angular/cdk/stepper";
     MatMenuModule,
     MatBadgeModule,
     MatDivider
-],
+  ],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarComponent {
   isAuthenticated = false;
-  currentUser: User | null = null;
-  private authSubscription?: Subscription;
+  currentUser: any = null;
 
   constructor(
     private router: Router,
     private authService: AuthService
-  ) {}
-
-  ngOnInit(): void {
-    // S'abonner aux changements d'authentification
-    this.authSubscription = this.authService.currentUser$.subscribe(user => {
+  ) {
+    // Utiliser effect pour réagir aux changements du signal d'authentification
+    effect(() => {
+      const user = this.authService.currentUser();
+      this.isAuthenticated = this.authService.isAuthenticated();
       this.currentUser = user;
-      this.isAuthenticated = !!user;
+      
+      console.log('🔄 Navbar updated - User:', user ? user.email : 'none');
     });
-  }
-
-  ngOnDestroy(): void {
-    this.authSubscription?.unsubscribe();
   }
 
   get userName(): string {

@@ -1,17 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatStepperModule } from '@angular/material/stepper';
 import { AuthService } from '../../../../core/services/auth.service';
-import { User } from '../../../../shared/models/user.model';
 
 @Component({
   selector: 'app-register',
@@ -25,9 +24,9 @@ import { User } from '../../../../shared/models/user.model';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatStepperModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatStepperModule
+    MatSnackBarModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
@@ -36,6 +35,7 @@ export class RegisterComponent {
   accountFormGroup: FormGroup;
   personalFormGroup: FormGroup;
   addressFormGroup: FormGroup;
+  
   loading = false;
   hidePassword = true;
   hideConfirmPassword = true;
@@ -47,100 +47,106 @@ export class RegisterComponent {
     private snackBar: MatSnackBar
   ) {
     // Rediriger si déjà connecté
-    if (this.authService.isAuthenticated) {
+    if (this.authService.isAuthenticated()) {
       this.router.navigate(['/']);
     }
 
-    // Formulaire 1: Informations de compte
+    // Étape 1: Compte
     this.accountFormGroup = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
-    }, { validator: this.passwordMatchValidator });
+    }, {
+      validators: this.passwordMatchValidator
+    });
 
-    // Formulaire 2: Informations personnelles
+    // Étape 2: Informations personnelles
     this.personalFormGroup = this.fb.group({
       prenom: ['', [Validators.required, Validators.minLength(2)]],
       nom: ['', [Validators.required, Validators.minLength(2)]],
       telephone: ['', [Validators.required, Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]]
     });
 
-    // Formulaire 3: Adresse
+    // Étape 3: Adresse
     this.addressFormGroup = this.fb.group({
-      rue: ['', Validators.required],
-      ville: ['', Validators.required],
-      province: ['QC', Validators.required],
+      rue: ['', [Validators.required]],
+      ville: ['', [Validators.required]],
+      province: ['', [Validators.required]],
       codePostal: ['', [Validators.required, Validators.pattern(/^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i)]],
-      pays: ['Canada', Validators.required]
+      pays: ['Canada', [Validators.required]]
     });
   }
 
-  // Validateur personnalisé pour vérifier que les mots de passe correspondent
-  passwordMatchValidator(g: FormGroup) {
-    const password = g.get('password')?.value;
-    const confirmPassword = g.get('confirmPassword')?.value;
+  passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
+    
+    if (!password || !confirmPassword) {
+      return null;
+    }
+    
     return password === confirmPassword ? null : { mismatch: true };
   }
 
-  formatPhoneNumber(event: any): void {
-    let value = event.target.value.replace(/\D/g, '');
+  formatPhoneNumber(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '');
+    
     if (value.length >= 6) {
-      value = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6, 10);
+      value = `${value.slice(0, 3)}-${value.slice(3, 6)}-${value.slice(6, 10)}`;
     } else if (value.length >= 3) {
-      value = value.substring(0, 3) + '-' + value.substring(3);
+      value = `${value.slice(0, 3)}-${value.slice(3)}`;
     }
-    this.personalFormGroup.patchValue({ telephone: value });
+    
+    this.personalFormGroup.patchValue({ telephone: value }, { emitEvent: false });
   }
 
-  formatPostalCode(event: any): void {
-    let value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (value.length >= 4) {
-      value = value.substring(0, 3) + ' ' + value.substring(3, 6);
+  formatPostalCode(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    
+    if (value.length > 3) {
+      value = `${value.slice(0, 3)} ${value.slice(3, 6)}`;
     }
-    this.addressFormGroup.patchValue({ codePostal: value });
+    
+    this.addressFormGroup.patchValue({ codePostal: value }, { emitEvent: false });
   }
 
   onSubmit(): void {
-    if (this.accountFormGroup.invalid || this.personalFormGroup.invalid || this.addressFormGroup.invalid) {
-      return;
-    }
+    if (this.accountFormGroup.valid && this.personalFormGroup.valid && this.addressFormGroup.valid) {
+      this.loading = true;
 
-    this.loading = true;
-
-    const userData: Omit<User, 'id' | 'createdAt'> = {
-      email: this.accountFormGroup.value.email,
-      password: this.accountFormGroup.value.password,
-      nom: this.personalFormGroup.value.nom,
-      prenom: this.personalFormGroup.value.prenom,
-      telephone: this.personalFormGroup.value.telephone,
-      adresse: {
+      const registerData = {
+        email: this.accountFormGroup.value.email,
+        password: this.accountFormGroup.value.password,
+        nom: this.personalFormGroup.value.nom,
+        prenom: this.personalFormGroup.value.prenom,
+        telephone: this.personalFormGroup.value.telephone,
         rue: this.addressFormGroup.value.rue,
         ville: this.addressFormGroup.value.ville,
         province: this.addressFormGroup.value.province,
         codePostal: this.addressFormGroup.value.codePostal,
         pays: this.addressFormGroup.value.pays
-      }
-    };
+      };
 
-    this.authService.register(userData).subscribe({
-      next: (user) => {
-        this.snackBar.open('Inscription réussie ! Bienvenue 🎉', 'Fermer', {
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['success-snackbar']
-        });
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.snackBar.open('Erreur lors de l\'inscription', 'Fermer', {
-          duration: 5000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
-      }
-    });
+      this.authService.register(registerData).subscribe({
+        next: () => {
+          console.log('Registration successful');
+          this.snackBar.open('Inscription réussie ! Bienvenue !', 'Fermer', { duration: 3000 });
+          this.router.navigate(['/home']);
+        },
+        error: (error) => {
+          console.error('Registration error:', error);
+          const errorMessage = error.error?.message || 'Une erreur est survenue lors de l\'inscription';
+          this.snackBar.open(errorMessage, 'Fermer', { duration: 5000 });
+          this.loading = false;
+        },
+        complete: () => {
+          this.loading = false;
+        }
+      });
+    } else {
+      this.snackBar.open('Veuillez remplir tous les champs correctement', 'Fermer', { duration: 3000 });
+    }
   }
 }

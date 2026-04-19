@@ -1,157 +1,135 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { delay, tap, map, catchError } from 'rxjs/operators';
-import { Annonce } from '../../shared/models/annonce.model';
+import { Injectable, signal } from '@angular/core';
+import { AnnonceHttpService, AnnonceResponse, CreateAnnonceRequest } from './annonce-http.service';
+import { catchError, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AnnonceService {
-  
-  private readonly DATA_URL = 'assets/data/annonces.json';
-  private annoncesSubject = new BehaviorSubject<Annonce[]>([]);
-  private dataLoaded = false;
+  private annoncesSignal = signal<AnnonceResponse[]>([]);
+  private myAnnoncesSignal = signal<AnnonceResponse[]>([]);
+  private selectedAnnonceSignal = signal<AnnonceResponse | null>(null);
 
-  constructor(private http: HttpClient) {
-    this.loadInitialData();
-  }
+  annonces = this.annoncesSignal.asReadonly();
+  myAnnonces = this.myAnnoncesSignal.asReadonly();
+  selectedAnnonce = this.selectedAnnonceSignal.asReadonly();
 
-  // Charger les données initiales depuis le fichier JSON
-  private loadInitialData(): void {
-    this.http.get<Annonce[]>(this.DATA_URL).pipe(
-      map(annonces => annonces.map(a => ({
-        ...a,
-        dateDisponibilite: new Date(a.dateDisponibilite),
-        createdAt: a.createdAt ? new Date(a.createdAt) : undefined,
-        updatedAt: a.updatedAt ? new Date(a.updatedAt) : undefined
-      }))),
-      tap(annonces => {
-        this.annoncesSubject.next(annonces);
-        this.dataLoaded = true;
-        console.log('Annonces chargées depuis JSON:', annonces.length);
+  constructor(private annonceHttp: AnnonceHttpService) {}
+
+  loadActiveAnnonces() {
+    return this.annonceHttp.getActiveAnnonces().pipe(
+      tap((annonces) => {
+        this.annoncesSignal.set(annonces);
       }),
-      catchError(error => {
-        console.error('Erreur lors du chargement des annonces:', error);
-        return of([]);
+      catchError((error) => {
+        console.error('Error loading annonces:', error);
+        return throwError(() => error);
       })
-    ).subscribe();
-  }
-
-  // Récupérer toutes les annonces actives
-  getAnnonces(): Observable<Annonce[]> {
-    if (!this.dataLoaded) {
-      // Attendre que les données soient chargées
-      return this.http.get<Annonce[]>(this.DATA_URL).pipe(
-        map(annonces => annonces
-          .filter(a => a.active)
-          .map(a => ({
-            ...a,
-            dateDisponibilite: new Date(a.dateDisponibilite),
-            createdAt: a.createdAt ? new Date(a.createdAt) : undefined,
-            updatedAt: a.updatedAt ? new Date(a.updatedAt) : undefined
-          }))
-        ),
-        delay(500)
-      );
-    }
-    return of(this.annoncesSubject.value.filter(a => a.active)).pipe(
-      delay(500)
     );
   }
 
-  // Récupérer une annonce par ID
-  getAnnonceById(id: string): Observable<Annonce | undefined> {
-    return of(this.annoncesSubject.value.find(a => a.id === id)).pipe(
-      delay(300)
+  loadMyAnnonces() {
+    return this.annonceHttp.getMyAnnonces().pipe(
+      tap((annonces) => {
+        this.myAnnoncesSignal.set(annonces);
+      }),
+      catchError((error) => {
+        console.error('Error loading my annonces:', error);
+        return throwError(() => error);
+      })
     );
   }
 
-  // Rechercher des annonces
-  searchAnnonces(query: string): Observable<Annonce[]> {
-    const lowerQuery = query.toLowerCase();
-    const results = this.annoncesSubject.value.filter(a => 
-      a.active && (
-        a.titre.toLowerCase().includes(lowerQuery) ||
-        a.descriptionCourte.toLowerCase().includes(lowerQuery) ||
-        a.adresse.ville.toLowerCase().includes(lowerQuery)
-      )
+  loadAnnonceById(id: string) {
+    return this.annonceHttp.getAnnonceById(id).pipe(
+      tap((annonce) => {
+        this.selectedAnnonceSignal.set(annonce);
+      }),
+      catchError((error) => {
+        console.error('Error loading annonce:', error);
+        return throwError(() => error);
+      })
     );
-    return of(results).pipe(delay(400));
   }
 
-  // Créer une nouvelle annonce (simulation - s'arrête au service)
-  createAnnonce(annonce: Omit<Annonce, 'id' | 'createdAt' | 'updatedAt'>): Observable<Annonce> {
-    const newAnnonce: Annonce = {
-      ...annonce,
-      id: 'annonce-' + Math.random().toString(36).substr(2, 9),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    // Simulation : on ajoute en mémoire mais on ne persiste pas dans le fichier JSON
-    const currentAnnonces = this.annoncesSubject.value;
-    this.annoncesSubject.next([newAnnonce, ...currentAnnonces]);
-
-    console.log('📤 Simulation envoi au serveur (s\'arrête au service):', newAnnonce);
-
-    return of(newAnnonce).pipe(delay(1000));
+  searchAnnonces(query: string) {
+    return this.annonceHttp.searchAnnonces(query).pipe(
+      tap((annonces) => {
+        this.annoncesSignal.set(annonces);
+      }),
+      catchError((error) => {
+        console.error('Error searching annonces:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  // Récupérer les annonces d'un utilisateur spécifique
-  getAnnoncesByUserId(userId: string): Observable<Annonce[]> {
-    const userAnnonces = this.annoncesSubject.value.filter(a => a.userId === userId);
-    return of(userAnnonces).pipe(delay(300));
+  createAnnonce(annonceData: CreateAnnonceRequest) {
+    return this.annonceHttp.createAnnonce(annonceData).pipe(
+      tap((newAnnonce) => {
+        // Ajouter à la liste des annonces
+        this.annoncesSignal.update(annonces => [newAnnonce, ...annonces]);
+        this.myAnnoncesSignal.update(annonces => [newAnnonce, ...annonces]);
+      }),
+      catchError((error) => {
+        console.error('Error creating annonce:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  // Mettre à jour une annonce (simulation - s'arrête au service)
-  updateAnnonce(id: string, updates: Partial<Annonce>): Observable<Annonce | undefined> {
-    const currentAnnonces = this.annoncesSubject.value;
-    const index = currentAnnonces.findIndex(a => a.id === id);
-    
-    if (index !== -1) {
-      const updatedAnnonce = {
-        ...currentAnnonces[index],
-        ...updates,
-        updatedAt: new Date()
-      };
-      currentAnnonces[index] = updatedAnnonce;
-      this.annoncesSubject.next([...currentAnnonces]);
-
-      console.log('📤 Simulation mise à jour au serveur (s\'arrête au service):', updatedAnnonce);
-
-      return of(updatedAnnonce).pipe(delay(500));
-    }
-    
-    return of(undefined).pipe(delay(500));
+  updateAnnonce(id: string, annonceData: Partial<CreateAnnonceRequest>) {
+    return this.annonceHttp.updateAnnonce(id, annonceData).pipe(
+      tap((updatedAnnonce) => {
+        // Mettre à jour dans les listes
+        this.annoncesSignal.update(annonces =>
+          annonces.map(a => a.id === id ? updatedAnnonce : a)
+        );
+        this.myAnnoncesSignal.update(annonces =>
+          annonces.map(a => a.id === id ? updatedAnnonce : a)
+        );
+        this.selectedAnnonceSignal.set(updatedAnnonce);
+      }),
+      catchError((error) => {
+        console.error('Error updating annonce:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  // Activer/Désactiver une annonce (simulation - s'arrête au service)
-  toggleAnnonceStatus(id: string): Observable<Annonce | undefined> {
-    const currentAnnonces = this.annoncesSubject.value;
-    const index = currentAnnonces.findIndex(a => a.id === id);
-    
-    if (index !== -1) {
-      currentAnnonces[index].active = !currentAnnonces[index].active;
-      currentAnnonces[index].updatedAt = new Date();
-      this.annoncesSubject.next([...currentAnnonces]);
-
-      console.log('📤 Simulation toggle status au serveur (s\'arrête au service):', currentAnnonces[index]);
-
-      return of(currentAnnonces[index]).pipe(delay(500));
-    }
-    
-    return of(undefined).pipe(delay(500));
+  deleteAnnonce(id: string) {
+    return this.annonceHttp.deleteAnnonce(id).pipe(
+      tap(() => {
+        // Retirer des listes
+        this.annoncesSignal.update(annonces =>
+          annonces.filter(a => a.id !== id)
+        );
+        this.myAnnoncesSignal.update(annonces =>
+          annonces.filter(a => a.id !== id)
+        );
+      }),
+      catchError((error) => {
+        console.error('Error deleting annonce:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  // Incrémenter le nombre de consultations (simulation)
-  incrementConsultations(id: string): void {
-    const currentAnnonces = this.annoncesSubject.value;
-    const annonce = currentAnnonces.find(a => a.id === id);
-    if (annonce) {
-      annonce.nombreConsultations++;
-      this.annoncesSubject.next([...currentAnnonces]);
-      console.log('📤 Simulation incrémentation consultations (s\'arrête au service)');
-    }
+  toggleAnnonceStatus(id: string) {
+    return this.annonceHttp.toggleAnnonceStatus(id).pipe(
+      tap((updatedAnnonce) => {
+        // Mettre à jour dans les listes
+        this.annoncesSignal.update(annonces =>
+          annonces.map(a => a.id === id ? updatedAnnonce : a)
+        );
+        this.myAnnoncesSignal.update(annonces =>
+          annonces.map(a => a.id === id ? updatedAnnonce : a)
+        );
+      }),
+      catchError((error) => {
+        console.error('Error toggling annonce status:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }
