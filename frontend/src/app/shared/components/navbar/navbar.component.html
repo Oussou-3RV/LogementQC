@@ -1,68 +1,159 @@
-<div class="shadow-md bg-white shadow-lg">
-  <div class="container mx-auto flex items-center justify-between p-4">
-    <!-- Logo et titre -->
-    <div class="flex items-center space-x-2 cursor-pointer" (click)="navigateTo('/')">
-      <mat-icon>home</mat-icon>
-      <span class="text-xl font-bold">Annonces Logement</span>
-    </div>
-
-    <!-- Navigation -->
-    <nav class="hidden md:flex space-x-4">
-      <button mat-button (click)="navigateTo('/')">
-        <mat-icon class="text-black">search</mat-icon>
-        <span class="text-black">Annonces</span>
-      </button>
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
       
-      <button mat-button (click)="navigateTo('/annonces/create')" *ngIf="isAuthenticated">
-        <mat-icon class="text-green-800">add_circle</mat-icon>
-        <span class="text-green-800">Publier</span>
-      </button>
-    </nav>
+      <!-- Logo et titre -->
+      <div 
+        class="flex items-center space-x-3 cursor-pointer group"
+        (click)="navigateTo('/')">
+        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition-colors">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+        </div>
+        <span class="text-xl font-semibold text-slate-800">LogementQC</span>
+      </div>
 
-    <!-- Actions utilisateur -->
-    <div class="flex items-center space-x-2">
-      <ng-container *ngIf="!isAuthenticated">
-        <button mat-button (click)="navigateTo('/auth/login')" class="">
-          Connexion
+      <!-- Navigation desktop -->
+      <div class="hidden md:flex items-center space-x-1">
+        <button 
+          (click)="navigateTo('/')"
+          class="px-4 py-2 text-slate-700 hover:text-slate-900 hover:bg-gray-50 rounded-lg transition-colors font-medium">
+          Annonces
         </button>
-        <button mat-raised-button color="accent" routerLink="/auth/register">
-          Inscription
+        
+        <button 
+          *ngIf="isAuthenticated"
+          (click)="navigateTo('/annonces/create')"
+          class="px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors font-medium flex items-center">
+          <svg class="w-5 h-5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Publier
         </button>
-      </ng-container>
+      </div>
 
-      <ng-container *ngIf="isAuthenticated">
-        <button mat-icon-button [matMenuTriggerFor]="userMenu">
-          <mat-icon class="text-black">account_circle</mat-icon>
-        </button>
-        <mat-menu #userMenu="matMenu">
-          <button mat-menu-item (click)="navigateTo('/profile')">
-            <mat-icon>person</mat-icon>
-            <span>Mon Profil</span>
+      <!-- Actions utilisateur -->
+      <div class="flex items-center space-x-3">
+        
+        <!-- Non connecté -->
+        <ng-container *ngIf="!isAuthenticated">
+          <button 
+            (click)="navigateTo('/auth/login')"
+            class="px-4 py-2 text-slate-700 hover:text-slate-900 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+            Connexion
           </button>
-          <button mat-menu-item (click)="navigateTo('annonces/mes-annonces')">
-            <mat-icon>list</mat-icon>
-            <span>Mes Annonces</span>
+          <button 
+            (click)="navigateTo('/auth/register')"
+            class="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
+            Inscription
           </button>
-          <button mat-menu-item (click)="navigateTo('/messages')">
-            <mat-icon 
-              [matBadge]="unreadCount > 0 ? unreadCount : null" 
-              matBadgeColor="warn"
-              [matBadgeHidden]="unreadCount === 0">
-              mail
-            </mat-icon>
-            <span>Messages</span>
-            <span *ngIf="unreadCount > 0" 
-                  class="ml-2 bg-orange-500 text-white rounded-full px-2 py-1 text-xs">
-              {{ unreadCount }}
+        </ng-container>
+
+        <!-- Connecté -->
+        <ng-container *ngIf="isAuthenticated">
+          
+          <!-- Messages (avec badge) -->
+          <button 
+            (click)="navigateTo('/messages')"
+            class="relative p-2 text-slate-700 hover:text-slate-900 hover:bg-gray-50 rounded-lg transition-colors">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <!-- Badge non lus -->
+            <span 
+              *ngIf="unreadCount > 0"
+              class="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
             </span>
           </button>
-          <mat-divider></mat-divider>
-          <button mat-menu-item (click)="logout()">
-            <mat-icon>logout</mat-icon>
-            <span>Déconnexion</span>
-          </button>
-        </mat-menu>
-      </ng-container>
+
+          <!-- Menu utilisateur -->
+          <div class="relative">
+            <button 
+              (click)="toggleUserMenu()"
+              class="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+              <div class="w-8 h-8 bg-slate-800 text-white rounded-full flex items-center justify-center font-medium">
+                {{ getUserInitials() }}
+              </div>
+              <svg 
+                class="w-4 h-4 text-slate-700 transition-transform"
+                [class.rotate-180]="showUserMenu"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+
+            <!-- Dropdown menu -->
+            <div 
+              *ngIf="showUserMenu"
+              class="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
+              
+              <!-- User info -->
+              <div class="px-4 py-3 border-b border-gray-100">
+                <p class="text-sm font-medium text-slate-900">{{ userName }}</p>
+                <p class="text-xs text-slate-600 truncate">{{ currentUser?.email }}</p>
+              </div>
+
+              <!-- Menu items -->
+              <button 
+                (click)="navigateTo('/profile')"
+                class="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-gray-50 flex items-center transition-colors">
+                <svg class="w-5 h-5 mr-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                Mon profil
+              </button>
+
+              <button 
+                (click)="navigateTo('annonces/mes-annonces')"
+                class="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-gray-50 flex items-center transition-colors">
+                <svg class="w-5 h-5 mr-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Mes annonces
+              </button>
+
+              <button 
+                (click)="navigateTo('/messages')"
+                class="w-full px-4 py-2.5 text-left text-slate-700 hover:bg-gray-50 flex items-center transition-colors">
+                <svg class="w-5 h-5 mr-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                Messages
+                <span 
+                  *ngIf="unreadCount > 0"
+                  class="ml-auto px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                  {{ unreadCount }}
+                </span>
+              </button>
+
+              <div class="border-t border-gray-100 my-1"></div>
+
+              <button 
+                (click)="logout()"
+                class="w-full px-4 py-2.5 text-left text-red-600 hover:bg-red-50 flex items-center transition-colors">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                Déconnexion
+              </button>
+            </div>
+          </div>
+
+        </ng-container>
+
+      </div>
+
     </div>
   </div>
+</nav>
+
+<!-- Overlay pour fermer le menu -->
+<div 
+  *ngIf="showUserMenu"
+  (click)="toggleUserMenu()"
+  class="fixed inset-0 z-40">
 </div>

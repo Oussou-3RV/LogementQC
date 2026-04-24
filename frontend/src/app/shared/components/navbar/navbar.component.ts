@@ -1,28 +1,13 @@
 import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatDivider } from '@angular/material/divider';
 import { AuthService } from '@app/core/services/auth.service';
 import { MessageService } from '../../../core/services/message.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatMenuModule,
-    MatBadgeModule,
-    MatDivider
-  ],
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
@@ -30,13 +15,13 @@ export class NavbarComponent {
   isAuthenticated = false;
   currentUser: any = null;
   unreadCount = 0;
+  showUserMenu = false;
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private messageService: MessageService
   ) {
-    // Utiliser effect pour réagir aux changements du signal d'authentification
     effect(() => {
       const user = this.authService.currentUser();
       this.isAuthenticated = this.authService.isAuthenticated();
@@ -44,7 +29,6 @@ export class NavbarComponent {
       
       console.log('🔄 Navbar updated - User:', user ? user.email : 'none');
       
-      // Charger les messages non lus si connecté
       if (user) {
         this.loadUnreadCount();
       } else {
@@ -70,11 +54,24 @@ export class NavbarComponent {
     return this.currentUser ? `${this.currentUser.prenom} ${this.currentUser.nom}` : 'Utilisateur';
   }
 
+  getUserInitials(): string {
+    if (!this.currentUser) return 'U';
+    const firstInitial = this.currentUser.prenom?.charAt(0) || '';
+    const lastInitial = this.currentUser.nom?.charAt(0) || '';
+    return (firstInitial + lastInitial).toUpperCase();
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
   navigateTo(route: string): void {
+    this.showUserMenu = false;
     this.router.navigate([route]);
   }
 
   logout(): void {
+    this.showUserMenu = false;
     this.authService.logout();
     this.router.navigate(['/']);
   }

@@ -2,17 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatStepperModule } from '@angular/material/stepper';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AnnonceService } from '../../../../core/services/annonce.service';
 
@@ -21,18 +10,7 @@ import { AnnonceService } from '../../../../core/services/annonce.service';
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MatChipsModule,
-    MatStepperModule
+    ReactiveFormsModule
   ],
   templateUrl: './create-annonce.component.html',
   styleUrls: ['./create-annonce.component.scss']
@@ -43,20 +21,17 @@ export class CreateAnnonceComponent implements OnInit {
   photosForm: FormGroup;
   loading = false;
   photoUrls: string[] = [];
+  currentStep = 1;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private annonceService: AnnonceService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private router: Router
   ) {
-    // Vérifier si l'utilisateur est connecté (appel de fonction signal)
+    // Vérifier si l'utilisateur est connecté
     if (!this.authService.isAuthenticated()) {
-      this.snackBar.open('Vous devez être connecté pour publier une annonce', 'Fermer', {
-        duration: 5000,
-        panelClass: ['error-snackbar']
-      });
+      this.showErrorToast('Vous devez être connecté pour publier une annonce');
       this.router.navigate(['/auth/login']);
     }
 
@@ -86,12 +61,33 @@ export class CreateAnnonceComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  nextStep(): void {
+    if (this.currentStep === 1 && this.basicInfoForm.valid) {
+      this.currentStep = 2;
+      window.scrollTo(0, 0);
+    } else if (this.currentStep === 2 && this.addressForm.valid) {
+      this.currentStep = 3;
+      window.scrollTo(0, 0);
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+      window.scrollTo(0, 0);
+    }
+  }
+
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
+
   formatPostalCode(event: any): void {
     let value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (value.length >= 4) {
       value = value.substring(0, 3) + ' ' + value.substring(3, 6);
     }
-    this.addressForm.patchValue({ codePostal: value });
+    this.addressForm.patchValue({ codePostal: value }, { emitEvent: false });
   }
 
   addPhoto(): void {
@@ -113,7 +109,7 @@ export class CreateAnnonceComponent implements OnInit {
       const currentUser = this.authService.currentUser();
   
       if (!currentUser) {
-        this.showError('Vous devez être connecté');
+        this.showErrorToast('Vous devez être connecté');
         this.router.navigate(['/auth/login']);
         this.loading = false;
         return;
@@ -121,7 +117,7 @@ export class CreateAnnonceComponent implements OnInit {
 
       // Vérifier qu'il y a au moins une photo
       if (this.photoUrls.length === 0) {
-        this.showError('Veuillez ajouter au moins une photo');
+        this.showErrorToast('Veuillez ajouter au moins une photo');
         this.loading = false;
         return;
       }
@@ -148,36 +144,47 @@ export class CreateAnnonceComponent implements OnInit {
   
       this.annonceService.createAnnonce(newAnnonce).subscribe({
         next: () => {
-          this.showSuccess('Annonce créée avec succès !');
+          this.showSuccessToast('Annonce créée avec succès !');
           this.router.navigate(['/annonces/mes-annonces']);
         },
         error: (err) => {
           console.error('Erreur lors de la création:', err);
           const errorMsg = err.error?.message || 'Erreur lors de la création de l\'annonce';
-          this.showError(errorMsg);
+          this.showErrorToast(errorMsg);
           this.loading = false;
         }
       });
     } else {
-      this.showError('Veuillez remplir tous les champs obligatoires');
+      this.showErrorToast('Veuillez remplir tous les champs obligatoires');
     }
   }
 
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['success-snackbar']
-    });
+  private showSuccessToast(message: string): void {
+    this.showToast(message, 'success');
   }
 
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 5000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['error-snackbar']
-    });
+  private showErrorToast(message: string): void {
+    this.showToast(message, 'error');
+  }
+
+  private showToast(message: string, type: 'success' | 'error'): void {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform ${
+      type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-100');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-full');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   }
 }

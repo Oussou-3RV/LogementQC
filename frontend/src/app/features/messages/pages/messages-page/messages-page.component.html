@@ -1,133 +1,186 @@
-<div class="container mx-auto px-4 py-8">
-  
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-4 max-w-6xl">
+    
     <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800 flex items-center">
-          <mat-icon class="mr-2 text-blue-600">mail</mat-icon>
-          Mes messages
-        </h1>
-        <p class="text-gray-600 mt-2">Consultez vos conversations</p>
-      </div>
+    <div class="mb-8">
+      <h1 class="text-3xl font-semibold text-slate-900 flex items-center">
+        <svg class="w-8 h-8 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        Mes messages
+      </h1>
+      <p class="text-slate-600 mt-1">Consultez vos conversations</p>
     </div>
-  
+
     <!-- Loader -->
     <div *ngIf="loading" class="flex justify-center items-center py-20">
-      <mat-spinner></mat-spinner>
+      <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
     </div>
-  
+
     <!-- Contenu -->
     <div *ngIf="!loading">
       
       <!-- Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <mat-card class="bg-blue-50 hover:shadow-lg transition-shadow">
-          <mat-card-content class="flex items-center justify-between p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Messages reçus -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-700">Messages reçus</p>
+              <p class="text-sm font-medium text-slate-600 mb-1">Messages reçus</p>
               <p class="text-3xl font-bold text-blue-600">{{ receivedMessages.length }}</p>
             </div>
-            <mat-icon class="text-5xl text-blue-600 !h-14 !w-14">inbox</mat-icon>
-          </mat-card-content>
-        </mat-card>
-  
-        <mat-card class="bg-orange-50 hover:shadow-lg transition-shadow">
-          <mat-card-content class="flex items-center justify-between p-6">
+            <div class="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Non lus -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-700">Non lus</p>
+              <p class="text-sm font-medium text-slate-600 mb-1">Non lus</p>
               <p class="text-3xl font-bold text-orange-600">{{ unreadMessages.length }}</p>
             </div>
-            <mat-icon class="text-5xl text-orange-600 !h-14 !w-14">mark_email_unread</mat-icon>
-          </mat-card-content>
-        </mat-card>
-  
-        <mat-card class="bg-green-50 hover:shadow-lg transition-shadow">
-          <mat-card-content class="flex items-center justify-between p-6">
+            <div class="w-14 h-14 bg-orange-50 rounded-lg flex items-center justify-center">
+              <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages envoyés -->
+        <div class="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-700">Messages envoyés</p>
+              <p class="text-sm font-medium text-slate-600 mb-1">Messages envoyés</p>
               <p class="text-3xl font-bold text-green-600">{{ sentMessages.length }}</p>
             </div>
-            <mat-icon class="text-5xl text-green-600 !h-14 !w-14">send</mat-icon>
-          </mat-card-content>
-        </mat-card>
+            <div class="w-14 h-14 bg-green-50 rounded-lg flex items-center justify-center">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
-  
-      <!-- Tabs -->
-      <mat-card class="shadow-lg">
-        <mat-card-content class="p-0">
-          <mat-tab-group>
-            
-            <!-- Messages reçus -->
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon class="mr-2 text-blue-600">inbox</mat-icon>
-                <span class="font-medium">Reçus</span>
-                <span *ngIf="unreadMessages.length > 0" 
-                      class="ml-2 bg-orange-500 text-white rounded-full px-2 py-1 text-xs font-semibold">
-                  {{ unreadMessages.length }}
-                </span>
-              </ng-template>
-              <div class="p-6 bg-gray-50">
-                <app-message-list 
-                  [messages]="receivedMessages"
-                  [type]="'received'"
-                  (markAsRead)="onMarkAsRead($event)"
-                  (reply)="onReply($event)">
-                </app-message-list>
-              </div>
-            </mat-tab>
-  
-            <!-- Messages envoyés -->
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon class="mr-2 text-green-600">send</mat-icon>
-                <span class="font-medium">Envoyés</span>
-                <span class="ml-2 text-gray-500 text-sm">({{ sentMessages.length }})</span>
-              </ng-template>
-              <div class="p-6 bg-gray-50">
-                <app-message-list 
-                  [messages]="sentMessages"
-                  [type]="'sent'">
-                </app-message-list>
-              </div>
-            </mat-tab>
-  
-            <!-- Non lus -->
-            <mat-tab>
-              <ng-template mat-tab-label>
-                <mat-icon class="mr-2 text-orange-600">mark_email_unread</mat-icon>
-                <span class="font-medium">Non lus</span>
-                <span class="ml-2 text-gray-500 text-sm">({{ unreadMessages.length }})</span>
-              </ng-template>
-              <div class="p-6 bg-gray-50">
-                <app-message-list 
-                  [messages]="unreadMessages"
-                  [type]="'received'"
-                  (markAsRead)="onMarkAsRead($event)"
-                  (reply)="onReply($event)">
-                </app-message-list>
-              </div>
-            </mat-tab>
-  
-          </mat-tab-group>
-        </mat-card-content>
-      </mat-card>
-  
+
+      <!-- Tabs personnalisés -->
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        
+        <!-- Tab headers -->
+        <div class="border-b border-gray-200 bg-gray-50">
+          <div class="flex">
+            <button 
+              (click)="selectedTab = 'received'"
+              class="flex-1 px-6 py-4 text-sm font-medium transition-colors flex items-center justify-center border-b-2 relative"
+              [class.border-blue-600]="selectedTab === 'received'"
+              [class.text-blue-600]="selectedTab === 'received'"
+              [class.bg-white]="selectedTab === 'received'"
+              [class.border-transparent]="selectedTab !== 'received'"
+              [class.text-slate-600]="selectedTab !== 'received'">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+              </svg>
+              Reçus
+              <span *ngIf="unreadMessages.length > 0" 
+                    class="ml-2 px-2 py-0.5 bg-orange-500 text-white text-xs font-semibold rounded-full">
+                {{ unreadMessages.length }}
+              </span>
+            </button>
+            <button 
+              (click)="selectedTab = 'sent'"
+              class="flex-1 px-6 py-4 text-sm font-medium transition-colors flex items-center justify-center border-b-2"
+              [class.border-blue-600]="selectedTab === 'sent'"
+              [class.text-blue-600]="selectedTab === 'sent'"
+              [class.bg-white]="selectedTab === 'sent'"
+              [class.border-transparent]="selectedTab !== 'sent'"
+              [class.text-slate-600]="selectedTab !== 'sent'">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+              </svg>
+              Envoyés ({{ sentMessages.length }})
+            </button>
+            <button 
+              (click)="selectedTab = 'unread'"
+              class="flex-1 px-6 py-4 text-sm font-medium transition-colors flex items-center justify-center border-b-2"
+              [class.border-blue-600]="selectedTab === 'unread'"
+              [class.text-blue-600]="selectedTab === 'unread'"
+              [class.bg-white]="selectedTab === 'unread'"
+              [class.border-transparent]="selectedTab !== 'unread'"
+              [class.text-slate-600]="selectedTab !== 'unread'">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              Non lus ({{ unreadMessages.length }})
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab content -->
+        <div class="p-6">
+          
+          <!-- Reçus -->
+          <div *ngIf="selectedTab === 'received'">
+            <app-message-list 
+              [messages]="receivedMessages"
+              [type]="'received'"
+              (markAsRead)="onMarkAsRead($event)"
+              (reply)="onReply($event)">
+            </app-message-list>
+          </div>
+
+          <!-- Envoyés -->
+          <div *ngIf="selectedTab === 'sent'">
+            <app-message-list 
+              [messages]="sentMessages"
+              [type]="'sent'">
+            </app-message-list>
+          </div>
+
+          <!-- Non lus -->
+          <div *ngIf="selectedTab === 'unread'">
+            <app-message-list 
+              [messages]="unreadMessages"
+              [type]="'received'"
+              (markAsRead)="onMarkAsRead($event)"
+              (reply)="onReply($event)">
+            </app-message-list>
+          </div>
+
+        </div>
+      </div>
+
       <!-- Message si vide -->
       <div *ngIf="receivedMessages.length === 0 && sentMessages.length === 0" 
-           class="text-center py-16 mt-8 bg-white rounded-lg shadow-md">
-        <mat-icon class="text-6xl text-gray-300 mb-4 !h-16 !w-16">mail_outline</mat-icon>
-        <h3 class="text-2xl font-semibold text-gray-700 mb-2">Aucun message</h3>
-        <p class="text-gray-500 mb-6">Vous n'avez pas encore de messages</p>
+           class="text-center py-16 mt-8 bg-white rounded-lg border border-gray-200">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-slate-900 mb-2">Aucun message</h3>
+        <p class="text-slate-600 mb-6">Vous n'avez pas encore de messages</p>
         <button 
-          mat-raised-button 
-          color="primary"
-          routerLink="/home"
-          class="bg-indigo-600 hover:bg-indigo-700">
-          <mat-icon>search</mat-icon>
+          (click)="goToHome()"
+          class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
           Parcourir les annonces
         </button>
       </div>
-  
+
     </div>
+
   </div>
+</div>
+
+<!-- Dialog de réponse -->
+<app-reply-message-dialog
+  *ngIf="showReplyDialog && selectedMessage"
+  [originalMessage]="selectedMessage"
+  (close)="closeReplyDialog()"
+  (send)="sendReply($event)">
+</app-reply-message-dialog>

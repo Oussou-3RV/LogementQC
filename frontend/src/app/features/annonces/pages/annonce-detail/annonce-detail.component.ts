@@ -1,12 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PhotoGalleryComponent } from '../../components/photo-gallery/photo-gallery.component';
 import { ContactFormComponent } from '../../components/contact-form/contact-form.component';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -14,18 +8,11 @@ import { AnnonceService } from '../../../../core/services/annonce.service';
 import { AnnonceResponse } from '../../../../core/services/annonce-http.service';
 import { MessageService } from '../../../../core/services/message.service';
 
-
 @Component({
   selector: 'app-annonce-detail',
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatIconModule,
-    MatChipsModule,
-    MatDividerModule,
-    MatSnackBarModule,
-    MatProgressSpinnerModule,
     PhotoGalleryComponent,
     ContactFormComponent
   ],
@@ -43,12 +30,10 @@ export class AnnonceDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private messageService: MessageService,
     private annonceService: AnnonceService,
-    private snackBar: MatSnackBar,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    // Récupérer l'état d'authentification via signal
     this.isAuthenticated = this.authService.isAuthenticated();
     
     const user = this.authService.currentUser();
@@ -74,14 +59,14 @@ export class AnnonceDetailComponent implements OnInit, OnDestroy {
         if (selectedAnnonce) {
           this.annonce = selectedAnnonce;
         } else {
-          this.showError('Annonce introuvable');
+          this.showErrorToast('Annonce introuvable');
           this.router.navigate(['/']);
         }
         this.loading = false;
       },
       error: (err) => {
         console.error('Erreur lors du chargement de l\'annonce:', err);
-        this.showError('Erreur lors du chargement');
+        this.showErrorToast('Erreur lors du chargement');
         this.loading = false;
         this.router.navigate(['/']);
       }
@@ -92,7 +77,7 @@ export class AnnonceDetailComponent implements OnInit, OnDestroy {
     if (!this.annonce) return;
   
     if (!this.isAuthenticated) {
-      this.showError('Vous devez être connecté pour envoyer un message');
+      this.showErrorToast('Vous devez être connecté pour envoyer un message');
       this.router.navigate(['/auth/login']);
       return;
     }
@@ -103,12 +88,12 @@ export class AnnonceDetailComponent implements OnInit, OnDestroy {
       contenu: message.contenu
     }).subscribe({
       next: () => {
-        this.showSuccess('Message envoyé avec succès !');
+        this.showSuccessToast('Message envoyé avec succès !');
       },
       error: (err) => {
         console.error('Erreur lors de l\'envoi du message:', err);
         const errorMsg = err.error?.message || 'Erreur lors de l\'envoi du message';
-        this.showError(errorMsg);
+        this.showErrorToast(errorMsg);
       }
     });
   }
@@ -117,21 +102,42 @@ export class AnnonceDetailComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['success-snackbar']
-    });
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'long',
+      day: 'numeric'
+    };
+    return date.toLocaleDateString('fr-FR', options);
   }
 
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 5000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['error-snackbar']
-    });
+  private showSuccessToast(message: string): void {
+    this.showToast(message, 'success');
+  }
+
+  private showErrorToast(message: string): void {
+    this.showToast(message, 'error');
+  }
+
+  private showToast(message: string, type: 'success' | 'error'): void {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform ${
+      type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-100');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-full');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   }
 }

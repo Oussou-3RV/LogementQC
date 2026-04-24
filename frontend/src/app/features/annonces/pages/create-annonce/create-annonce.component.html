@@ -1,282 +1,397 @@
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <mat-card>
-      <mat-card-header class="mb-4">
-        <mat-card-title class="text-3xl font-bold flex items-center">
-          <mat-icon class="mr-2 text-blue-600">add_circle</mat-icon>
-          <span class="text-cyan-500 py-4">Publier une annonce</span>
-        </mat-card-title>
-        <mat-card-subtitle>Remplissez les informations pour créer votre annonce de logement</mat-card-subtitle>
-      </mat-card-header>
-  
-      <mat-card-content>
-        <mat-stepper #stepper linear>
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="container mx-auto px-4 max-w-4xl">
+    
+    <!-- Header -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+      <div class="flex items-center mb-2">
+        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mr-4">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-semibold text-slate-900">Publier une annonce</h1>
+          <p class="text-slate-600">Remplissez les informations pour créer votre annonce de logement</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stepper custom -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+      <div class="flex items-center justify-between relative">
+        <!-- Ligne de progression -->
+        <div class="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-10">
+          <div 
+            class="h-full bg-blue-600 transition-all duration-300"
+            [style.width.%]="currentStep === 1 ? 0 : currentStep === 2 ? 50 : 100">
+          </div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="flex flex-col items-center">
+          <div 
+            class="w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors"
+            [class.bg-blue-600]="currentStep >= 1"
+            [class.text-white]="currentStep >= 1"
+            [class.bg-gray-200]="currentStep < 1"
+            [class.text-gray-600]="currentStep < 1">
+            <span *ngIf="currentStep > 1">✓</span>
+            <span *ngIf="currentStep <= 1">1</span>
+          </div>
+          <span class="text-xs mt-2 text-slate-700 font-medium">Informations</span>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col items-center">
+          <div 
+            class="w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors"
+            [class.bg-blue-600]="currentStep >= 2"
+            [class.text-white]="currentStep >= 2"
+            [class.bg-gray-200]="currentStep < 2"
+            [class.text-gray-600]="currentStep < 2">
+            <span *ngIf="currentStep > 2">✓</span>
+            <span *ngIf="currentStep <= 2">2</span>
+          </div>
+          <span class="text-xs mt-2 text-slate-700 font-medium">Localisation</span>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="flex flex-col items-center">
+          <div 
+            class="w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors"
+            [class.bg-blue-600]="currentStep >= 3"
+            [class.text-white]="currentStep >= 3"
+            [class.bg-gray-200]="currentStep < 3"
+            [class.text-gray-600]="currentStep < 3">
+            3
+          </div>
+          <span class="text-xs mt-2 text-slate-700 font-medium">Photos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenu des étapes -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+      
+      <!-- Étape 1: Informations de base -->
+      <div *ngIf="currentStep === 1">
+        <h2 class="text-xl font-semibold text-slate-900 mb-6">Décrivez votre logement</h2>
+        <form [formGroup]="basicInfoForm" class="space-y-5">
           
-          <!-- Étape 1: Informations de base -->
-          <mat-step [stepControl]="basicInfoForm">
-            <form [formGroup]="basicInfoForm">
-              <ng-template matStepLabel>Informations de base</ng-template>
-              
-              <div class="space-y-4 py-4">
-                <h3 class="text-white text-lg font-semibold mb-4">Décrivez votre logement</h3>
-  
-                <!-- Titre -->
-                <mat-form-field class="w-full" >
-                  <mat-label>Titre de l'annonce</mat-label>
-                  <input 
-                    matInput 
-                    formControlName="titre"
-                    placeholder="Ex: Bel appartement 3½ au centre-ville"
-                    maxlength="100"
-                  />
-                  <mat-hint align="end">{{ basicInfoForm.get('titre')?.value?.length || 0 }}/100</mat-hint>
-                  <mat-error *ngIf="basicInfoForm.get('titre')?.errors?.['required']">
-                    Le titre est obligatoire
-                  </mat-error>
-                  <mat-error *ngIf="basicInfoForm.get('titre')?.errors?.['minlength']">
-                    Minimum 10 caractères
-                  </mat-error>
-                </mat-form-field>
-  
-                <!-- Description courte -->
-                <mat-form-field class="w-full" >
-                  <mat-label>Description courte</mat-label>
-                  <textarea 
-                    matInput 
-                    formControlName="descriptionCourte"
-                    rows="2"
-                    placeholder="Résumé de votre annonce (visible sur les cartes)"
-                    maxlength="150"
-                  ></textarea>
-                  <mat-hint align="end">{{ basicInfoForm.get('descriptionCourte')?.value?.length || 0 }}/150</mat-hint>
-                  <mat-error *ngIf="basicInfoForm.get('descriptionCourte')?.errors?.['required']">
-                    La description courte est obligatoire
-                  </mat-error>
-                  <mat-error *ngIf="basicInfoForm.get('descriptionCourte')?.errors?.['minlength']">
-                    Minimum 20 caractères
-                  </mat-error>
-                </mat-form-field>
-  
-                <!-- Description longue -->
-                <mat-form-field class="w-full" >
-                  <mat-label>Description détaillée</mat-label>
-                  <textarea 
-                    matInput 
-                    formControlName="descriptionLongue"
-                    rows="6"
-                    placeholder="Décrivez en détail votre logement, ses caractéristiques, les commodités..."
-                  ></textarea>
-                  <mat-hint align="end">{{ basicInfoForm.get('descriptionLongue')?.value?.length || 0 }} caractères</mat-hint>
-                  <mat-error *ngIf="basicInfoForm.get('descriptionLongue')?.errors?.['required']">
-                    La description détaillée est obligatoire
-                  </mat-error>
-                  <mat-error *ngIf="basicInfoForm.get('descriptionLongue')?.errors?.['minlength']">
-                    Minimum 50 caractères
-                  </mat-error>
-                </mat-form-field>
-  
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <!-- Montant mensuel -->
-                  <mat-form-field class="w-full" >
-                    <mat-label>Loyer mensuel (CAD)</mat-label>
-                    <input 
-                      matInput 
-                      type="number"
-                      formControlName="montantMensuel"
-                      placeholder="950"
-                    />
-                    <span matTextPrefix>$ &nbsp;</span>
-                    <mat-error *ngIf="basicInfoForm.get('montantMensuel')?.errors?.['required']">
-                      Le montant est obligatoire
-                    </mat-error>
-                    <mat-error *ngIf="basicInfoForm.get('montantMensuel')?.errors?.['min']">
-                      Minimum 100$
-                    </mat-error>
-                  </mat-form-field>
-  
-                  <!-- Date de disponibilité -->
-                  <mat-form-field class="w-full" >
-                    <mat-label>Date de disponibilité</mat-label>
-                    <input 
-                      matInput 
-                      [matDatepicker]="picker"
-                      formControlName="dateDisponibilite"
-                    />
-                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
-                    <mat-error>La date est obligatoire</mat-error>
-                  </mat-form-field>
-                </div>
-  
-                <div class="flex justify-end space-x-2 mt-4">
-                  <button mat-button routerLink="/">Annuler</button>
-                  <button mat-raised-button color="primary" matStepperNext>Suivant</button>
-                </div>
+          <!-- Titre -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Titre de l'annonce <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text"
+              formControlName="titre"
+              placeholder="Ex: Bel appartement 3½ au centre-ville"
+              maxlength="100"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              [class.border-red-500]="basicInfoForm.get('titre')?.invalid && basicInfoForm.get('titre')?.touched">
+            <div class="flex justify-between mt-1">
+              <p *ngIf="basicInfoForm.get('titre')?.invalid && basicInfoForm.get('titre')?.touched" class="text-sm text-red-600">
+                <span *ngIf="basicInfoForm.get('titre')?.errors?.['required']">Le titre est obligatoire</span>
+                <span *ngIf="basicInfoForm.get('titre')?.errors?.['minlength']">Minimum 10 caractères</span>
+              </p>
+              <span class="text-xs text-slate-500">{{ basicInfoForm.get('titre')?.value?.length || 0 }}/100</span>
+            </div>
+          </div>
+
+          <!-- Description courte -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Description courte <span class="text-red-500">*</span>
+            </label>
+            <textarea 
+              formControlName="descriptionCourte"
+              rows="2"
+              placeholder="Résumé de votre annonce (visible sur les cartes)"
+              maxlength="150"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              [class.border-red-500]="basicInfoForm.get('descriptionCourte')?.invalid && basicInfoForm.get('descriptionCourte')?.touched">
+            </textarea>
+            <div class="flex justify-between mt-1">
+              <p *ngIf="basicInfoForm.get('descriptionCourte')?.invalid && basicInfoForm.get('descriptionCourte')?.touched" class="text-sm text-red-600">
+                <span *ngIf="basicInfoForm.get('descriptionCourte')?.errors?.['required']">La description courte est obligatoire</span>
+                <span *ngIf="basicInfoForm.get('descriptionCourte')?.errors?.['minlength']">Minimum 20 caractères</span>
+              </p>
+              <span class="text-xs text-slate-500">{{ basicInfoForm.get('descriptionCourte')?.value?.length || 0 }}/150</span>
+            </div>
+          </div>
+
+          <!-- Description longue -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Description détaillée <span class="text-red-500">*</span>
+            </label>
+            <textarea 
+              formControlName="descriptionLongue"
+              rows="6"
+              placeholder="Décrivez en détail votre logement, ses caractéristiques, les commodités..."
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              [class.border-red-500]="basicInfoForm.get('descriptionLongue')?.invalid && basicInfoForm.get('descriptionLongue')?.touched">
+            </textarea>
+            <div class="flex justify-between mt-1">
+              <p *ngIf="basicInfoForm.get('descriptionLongue')?.invalid && basicInfoForm.get('descriptionLongue')?.touched" class="text-sm text-red-600">
+                <span *ngIf="basicInfoForm.get('descriptionLongue')?.errors?.['required']">La description détaillée est obligatoire</span>
+                <span *ngIf="basicInfoForm.get('descriptionLongue')?.errors?.['minlength']">Minimum 50 caractères</span>
+              </p>
+              <span class="text-xs text-slate-500">{{ basicInfoForm.get('descriptionLongue')?.value?.length || 0 }} caractères</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Montant mensuel -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Loyer mensuel (CAD) <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600">$</span>
+                <input 
+                  type="number"
+                  formControlName="montantMensuel"
+                  placeholder="950"
+                  class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                  [class.border-red-500]="basicInfoForm.get('montantMensuel')?.invalid && basicInfoForm.get('montantMensuel')?.touched">
               </div>
-            </form>
-          </mat-step>
-  
-          <!-- Étape 2: Adresse -->
-          <mat-step [stepControl]="addressForm">
-            <form [formGroup]="addressForm">
-              <ng-template matStepLabel>Localisation</ng-template>
-              
-              <div class="space-y-4 py-4">
-                <h3 class="text-lg font-semibold mb-4">Où se trouve le logement ?</h3>
-  
-                <!-- Rue -->
-                <mat-form-field class="w-full" >
-                  <mat-label>Adresse</mat-label>
-                  <input 
-                    matInput 
-                    formControlName="rue"
-                    placeholder="123 Rue Example"
-                  />
-                  <mat-icon matPrefix>home</mat-icon>
-                  <mat-error>L'adresse est obligatoire</mat-error>
-                </mat-form-field>
-  
-                <!-- Ville -->
-                <mat-form-field class="w-full" >
-                  <mat-label>Ville</mat-label>
-                  <input 
-                    matInput 
-                    formControlName="ville"
-                    placeholder="Trois-Rivières"
-                  />
-                  <mat-icon matPrefix>location_city</mat-icon>
-                  <mat-error>La ville est obligatoire</mat-error>
-                </mat-form-field>
-  
-                <div class="grid grid-cols-2 gap-4">
-                  <!-- Province -->
-                  <mat-form-field class="w-full" >
-                    <mat-label>Province</mat-label>
-                    <input 
-                      matInput 
-                      formControlName="province"
-                      placeholder="QC"
-                    />
-                    <mat-error>La province est obligatoire</mat-error>
-                  </mat-form-field>
-  
-                  <!-- Code Postal -->
-                  <mat-form-field class="w-full" >
-                    <mat-label>Code Postal</mat-label>
-                    <input 
-                      matInput 
-                      formControlName="codePostal"
-                      placeholder="G8Z 1T3"
-                      (input)="formatPostalCode($event)"
-                      maxlength="7"
-                    />
-                    <mat-error *ngIf="addressForm.get('codePostal')?.errors?.['required']">
-                      Le code postal est obligatoire
-                    </mat-error>
-                    <mat-error *ngIf="addressForm.get('codePostal')?.errors?.['pattern']">
-                      Format: A1A 1A1
-                    </mat-error>
-                  </mat-form-field>
-                </div>
-  
-                <div class="flex justify-between space-x-2 mt-4">
-                  <button mat-button matStepperPrevious>Précédent</button>
-                  <button mat-raised-button color="primary" matStepperNext>Suivant</button>
-                </div>
-              </div>
-            </form>
-          </mat-step>
-  
-          <!-- Étape 3: Photos -->
-          <mat-step>
-            <ng-template matStepLabel>Photos</ng-template>
-            
-            <div class="space-y-4 py-4">
-              <h3 class="text-lg font-semibold mb-4">Ajoutez des photos</h3>
-  
-              <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-4">
-                <div class="flex items-start">
-                  <mat-icon class="text-blue-600 mr-2">info</mat-icon>
-                  <p class="text-sm text-blue-800">
-                    Pour le Jalon I, utilisez des URLs d'images (ex: depuis Unsplash, Pexels, ou vos propres images hébergées en ligne).
-                  </p>
-                </div>
-              </div>
-  
-              <!-- Formulaire d'ajout de photo -->
-              <form [formGroup]="photosForm" (ngSubmit)="addPhoto()" class="flex gap-2">
-                <mat-form-field class="flex-grow" >
-                  <mat-label>URL de la photo</mat-label>
-                  <input 
-                    matInput 
-                    formControlName="photoUrl"
-                    placeholder="https://example.com/photo.jpg"
-                  />
-                  <mat-icon matPrefix>image</mat-icon>
-                  <mat-error *ngIf="photosForm.get('photoUrl')?.errors?.['pattern']">
-                    URL invalide (doit commencer par http:// ou https://)
-                  </mat-error>
-                </mat-form-field>
-                <button 
-                  mat-raised-button 
-                  color="primary" 
-                  type="submit"
-                  [disabled]="photosForm.invalid || !photosForm.get('photoUrl')?.value"
-                >
-                  <mat-icon>add</mat-icon>
-                  Ajouter
-                </button>
-              </form>
-  
-              <!-- Liste des photos -->
-              <div *ngIf="photoUrls.length > 0" class="mt-4">
-                <h4 class="font-semibold mb-2">Photos ajoutées ({{ photoUrls.length }})</h4>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div 
-                    *ngFor="let url of photoUrls; let i = index"
-                    class="relative group"
-                  >
-                    <img 
-                      [src]="url" 
-                      [alt]="'Photo ' + (i + 1)"
-                      class="w-full h-32 object-cover rounded border"
-                    />
-                    <button 
-                      mat-mini-fab 
-                      color="warn"
-                      class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      (click)="removePhoto(i)"
-                    >
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                    <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 text-center">
-                      Photo {{ i + 1 }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-  
-              <div *ngIf="photoUrls.length === 0" class="text-center py-8 bg-gray-50 rounded">
-                <mat-icon class="text-4xl text-gray-400 mb-2">add_photo_alternate</mat-icon>
-                <p class="text-gray-600">Aucune photo ajoutée</p>
-                <p class="text-sm text-gray-500">Ajoutez au moins une photo pour continuer</p>
-              </div>
-  
-              <div class="flex justify-between space-x-2 mt-6">
-                <button mat-button matStepperPrevious>Précédent</button>
-                <button 
-                  mat-raised-button 
-                  color="primary" 
-                  (click)="onSubmit()"
-                  [disabled]="loading || photoUrls.length === 0"
-                >
-                  <mat-spinner diameter="20" *ngIf="loading" class="inline-block mr-2"></mat-spinner>
-                  <span *ngIf="!loading">Publier l'annonce</span>
-                  <span *ngIf="loading">Publication en cours...</span>
-                </button>
+              <p *ngIf="basicInfoForm.get('montantMensuel')?.invalid && basicInfoForm.get('montantMensuel')?.touched" class="mt-1 text-sm text-red-600">
+                <span *ngIf="basicInfoForm.get('montantMensuel')?.errors?.['required']">Le montant est obligatoire</span>
+                <span *ngIf="basicInfoForm.get('montantMensuel')?.errors?.['min']">Minimum 100$</span>
+              </p>
+            </div>
+
+            <!-- Date de disponibilité -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Date de disponibilité <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="date"
+                formControlName="dateDisponibilite"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                [class.border-red-500]="basicInfoForm.get('dateDisponibilite')?.invalid && basicInfoForm.get('dateDisponibilite')?.touched">
+              <p *ngIf="basicInfoForm.get('dateDisponibilite')?.invalid && basicInfoForm.get('dateDisponibilite')?.touched" class="mt-1 text-sm text-red-600">
+                La date est obligatoire
+              </p>
+            </div>
+          </div>
+
+        </form>
+
+        <!-- Actions -->
+        <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+          <button 
+            type="button"
+            (click)="goBack()"
+            class="px-5 py-2.5 border border-gray-300 text-slate-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+            Annuler
+          </button>
+          <button 
+            type="button"
+            (click)="nextStep()"
+            [disabled]="basicInfoForm.invalid"
+            class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            Suivant
+          </button>
+        </div>
+      </div>
+
+      <!-- Étape 2: Adresse -->
+      <div *ngIf="currentStep === 2">
+        <h2 class="text-xl font-semibold text-slate-900 mb-6">Où se trouve le logement ?</h2>
+        <form [formGroup]="addressForm" class="space-y-5">
+          
+          <!-- Rue -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Adresse <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text"
+              formControlName="rue"
+              placeholder="123 Rue Example"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              [class.border-red-500]="addressForm.get('rue')?.invalid && addressForm.get('rue')?.touched">
+            <p *ngIf="addressForm.get('rue')?.invalid && addressForm.get('rue')?.touched" class="mt-1 text-sm text-red-600">
+              L'adresse est obligatoire
+            </p>
+          </div>
+
+          <!-- Ville -->
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-2">
+              Ville <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text"
+              formControlName="ville"
+              placeholder="Trois-Rivières"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              [class.border-red-500]="addressForm.get('ville')?.invalid && addressForm.get('ville')?.touched">
+            <p *ngIf="addressForm.get('ville')?.invalid && addressForm.get('ville')?.touched" class="mt-1 text-sm text-red-600">
+              La ville est obligatoire
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Province -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Province <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text"
+                formControlName="province"
+                placeholder="QC"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                [class.border-red-500]="addressForm.get('province')?.invalid && addressForm.get('province')?.touched">
+              <p *ngIf="addressForm.get('province')?.invalid && addressForm.get('province')?.touched" class="mt-1 text-sm text-red-600">
+                La province est obligatoire
+              </p>
+            </div>
+
+            <!-- Code Postal -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                Code Postal <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text"
+                formControlName="codePostal"
+                placeholder="G8Z 1T3"
+                (input)="formatPostalCode($event)"
+                maxlength="7"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+                [class.border-red-500]="addressForm.get('codePostal')?.invalid && addressForm.get('codePostal')?.touched">
+              <p *ngIf="addressForm.get('codePostal')?.invalid && addressForm.get('codePostal')?.touched" class="mt-1 text-sm text-red-600">
+                <span *ngIf="addressForm.get('codePostal')?.errors?.['required']">Le code postal est obligatoire</span>
+                <span *ngIf="addressForm.get('codePostal')?.errors?.['pattern']">Format: A1A 1A1</span>
+              </p>
+            </div>
+          </div>
+
+        </form>
+
+        <!-- Actions -->
+        <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+          <button 
+            type="button"
+            (click)="previousStep()"
+            class="px-5 py-2.5 border border-gray-300 text-slate-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+            Précédent
+          </button>
+          <button 
+            type="button"
+            (click)="nextStep()"
+            [disabled]="addressForm.invalid"
+            class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+            Suivant
+          </button>
+        </div>
+      </div>
+
+      <!-- Étape 3: Photos -->
+      <div *ngIf="currentStep === 3">
+        <h2 class="text-xl font-semibold text-slate-900 mb-6">Ajoutez des photos</h2>
+
+        <!-- Info -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-sm text-blue-800">
+              Pour le moment, utilisez des URLs d'images (ex: depuis Unsplash, Pexels, ou vos propres images hébergées en ligne).
+            </p>
+          </div>
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <form [formGroup]="photosForm" (ngSubmit)="addPhoto()" class="flex gap-3 mb-6">
+          <div class="flex-1">
+            <input 
+              type="url"
+              formControlName="photoUrl"
+              placeholder="https://example.com/photo.jpg"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              [class.border-red-500]="photosForm.get('photoUrl')?.invalid && photosForm.get('photoUrl')?.touched">
+            <p *ngIf="photosForm.get('photoUrl')?.invalid && photosForm.get('photoUrl')?.touched" class="mt-1 text-sm text-red-600">
+              URL invalide (doit commencer par http:// ou https://)
+            </p>
+          </div>
+          <button 
+            type="submit"
+            [disabled]="photosForm.invalid || !photosForm.get('photoUrl')?.value"
+            class="px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Ajouter
+          </button>
+        </form>
+
+        <!-- Liste des photos -->
+        <div *ngIf="photoUrls.length > 0" class="mb-6">
+          <h3 class="font-medium text-slate-900 mb-3">Photos ajoutées ({{ photoUrls.length }})</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div 
+              *ngFor="let url of photoUrls; let i = index"
+              class="relative group">
+              <img 
+                [src]="url" 
+                [alt]="'Photo ' + (i + 1)"
+                class="w-full h-32 object-cover rounded-lg border border-gray-200">
+              <button 
+                type="button"
+                (click)="removePhoto(i)"
+                class="absolute top-2 right-2 w-8 h-8 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-700">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+              <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs py-1 px-2 rounded-b-lg text-center">
+                Photo {{ i + 1 }}
               </div>
             </div>
-          </mat-step>
-        </mat-stepper>
-      </mat-card-content>
-    </mat-card>
+          </div>
+        </div>
+
+        <!-- État vide -->
+        <div *ngIf="photoUrls.length === 0" class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+          <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          <p class="text-slate-600 mb-1">Aucune photo ajoutée</p>
+          <p class="text-sm text-slate-500">Ajoutez au moins une photo pour continuer</p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex justify-between mt-8 pt-6 border-t border-gray-200">
+          <button 
+            type="button"
+            (click)="previousStep()"
+            class="px-5 py-2.5 border border-gray-300 text-slate-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
+            Précédent
+          </button>
+          <button 
+            type="button"
+            (click)="onSubmit()"
+            [disabled]="loading || photoUrls.length === 0"
+            class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center">
+            <svg *ngIf="loading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span *ngIf="!loading">Publier l'annonce</span>
+            <span *ngIf="loading">Publication en cours...</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
   </div>
+</div>

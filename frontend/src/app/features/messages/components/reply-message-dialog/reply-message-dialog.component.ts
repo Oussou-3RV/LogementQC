@@ -1,12 +1,6 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MessageResponse } from '../../../../core/services/message-http.service';
 
 @Component({
@@ -14,40 +8,42 @@ import { MessageResponse } from '../../../../core/services/message-http.service'
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule
+    ReactiveFormsModule
   ],
-  templateUrl: 'reply-message-dialog.component.html',
+  templateUrl: './reply-message-dialog.component.html',
   styleUrls: ['./reply-message-dialog.component.scss']
 })
-export class ReplyMessageDialogComponent {
+export class ReplyMessageDialogComponent implements OnInit {
+  @Input() originalMessage!: MessageResponse;
+  @Output() close = new EventEmitter<void>();
+  @Output() send = new EventEmitter<any>();
+
   replyForm: FormGroup;
   loading = false;
 
-  constructor(
-    private fb: FormBuilder,
-    public dialogRef: MatDialogRef<ReplyMessageDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { originalMessage: MessageResponse }
-  ) {
+  constructor(private fb: FormBuilder) {
     this.replyForm = this.fb.group({
-      sujet: [`Re: ${data.originalMessage.sujet}`, [Validators.required, Validators.minLength(5)]],
+      sujet: ['', [Validators.required, Validators.minLength(5)]],
       contenu: ['', [Validators.required, Validators.minLength(20)]]
     });
   }
 
+  ngOnInit(): void {
+    if (this.originalMessage) {
+      this.replyForm.patchValue({
+        sujet: `Re: ${this.originalMessage.sujet}`
+      });
+    }
+  }
+
   onCancel(): void {
-    this.dialogRef.close();
+    this.close.emit();
   }
 
   onSend(): void {
     if (this.replyForm.valid) {
-      this.dialogRef.close({
-        annonceId: this.data.originalMessage.annonceId,
+      this.send.emit({
+        annonceId: this.originalMessage.annonceId,
         sujet: this.replyForm.value.sujet,
         contenu: this.replyForm.value.contenu
       });

@@ -1,18 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MessageService } from '../../../../core/services/message.service';
 import { MessageResponse } from '../../../../core/services/message-http.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { MessageListComponent } from "../../components/message-list/message-list.component"
-import { MatDialog } from '@angular/material/dialog';
+import { MessageListComponent } from '../../components/message-list/message-list.component';
 import { ReplyMessageDialogComponent } from '../../components/reply-message-dialog/reply-message-dialog.component';
 
 @Component({
@@ -20,33 +12,29 @@ import { ReplyMessageDialogComponent } from '../../components/reply-message-dial
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTabsModule,
-    MatBadgeModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule,
-    MessageListComponent
+    MessageListComponent,
+    ReplyMessageDialogComponent
   ],
   templateUrl: './messages-page.component.html',
+
 })
 export class MessagesPageComponent implements OnInit {
   receivedMessages: MessageResponse[] = [];
   sentMessages: MessageResponse[] = [];
   unreadMessages: MessageResponse[] = [];
   loading = true;
+  selectedTab: 'received' | 'sent' | 'unread' = 'received';
+  showReplyDialog = false;
+  selectedMessage: MessageResponse | null = null;
+ 
 
   constructor(
     private messageService: MessageService,
     private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private router: Router
   ) {
-    // Vérifier si connecté
     if (!this.authService.isAuthenticated()) {
-      this.snackBar.open('Vous devez être connecté', 'Fermer', { duration: 3000 });
+      this.showErrorToast('Vous devez être connecté');
       this.router.navigate(['/auth/login']);
     }
   }
@@ -58,7 +46,6 @@ export class MessagesPageComponent implements OnInit {
   loadMessages(): void {
     this.loading = true;
 
-    // Charger les messages reçus
     this.messageService.loadReceivedMessages().subscribe({
       next: () => {
         this.receivedMessages = this.messageService.receivedMessages();
@@ -70,7 +57,6 @@ export class MessagesPageComponent implements OnInit {
       }
     });
 
-    // Charger les non lus
     this.messageService.loadUnreadMessages().subscribe({
       next: () => {
         this.unreadMessages = this.messageService.unreadMessages();
@@ -94,56 +80,82 @@ export class MessagesPageComponent implements OnInit {
     });
   }
 
-  onReply(message: MessageResponse): void { 
-    const dialogRef = this.dialog.open(ReplyMessageDialogComponent, {
-      width: '600px',
-      data: { originalMessage: message }
-    });
-  
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.sendReply(result);
-      }
-    });
-  }
-  
-  private sendReply(replyData: any): void {
-    this.messageService.sendMessage(replyData).subscribe({
-      next: () => {
-        this.showSuccess('Réponse envoyée avec succès !');
-        this.loadMessages(); // Recharger les messages
-      },
-      error: (err) => {
-        console.error('Erreur envoi réponse:', err);
-        this.showError('Erreur lors de l\'envoi de la réponse');
-      }
-    });
-}
-
   onMarkAsRead(messageId: string): void {
     this.messageService.markMessageAsRead(messageId).subscribe({
       next: () => {
-        this.showSuccess('Message marqué comme lu');
+        this.showSuccessToast('Message marqué comme lu');
         this.loadMessages();
       },
       error: (err) => {
         console.error('Erreur marquage lu:', err);
-        this.showError('Erreur lors du marquage');
+        this.showErrorToast('Erreur lors du marquage');
       }
     });
   }
 
-  private showSuccess(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 3000,
-      panelClass: ['success-snackbar']
+  onReply(message: MessageResponse): void {
+    this.selectedMessage = message;
+    this.showReplyDialog = true;
+  }
+
+  closeReplyDialog(): void {
+    this.showReplyDialog = false;
+    this.selectedMessage = null;
+  }
+
+  sendReply(replyData: any): void {
+    if (!this.selectedMessage) return;
+
+    const messageData = {
+      annonceId: replyData.annonceId,
+      destinataireId: this.selectedMessage.expediteurId,
+      sujet: replyData.sujet,
+      contenu: replyData.contenu
+    };
+
+    this.messageService.sendMessage(messageData).subscribe({
+      next: () => {
+        this.showSuccessToast('Réponse envoyée avec succès !');
+        this.closeReplyDialog();
+        this.loadMessages();
+      },
+      error: (err) => {
+        console.error('Erreur envoi réponse:', err);
+        this.showErrorToast('Erreur lors de l\'envoi de la réponse');
+      }
     });
   }
 
-  private showError(message: string): void {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 5000,
-      panelClass: ['error-snackbar']
-    });
+  goToHome(): void {
+    this.router.navigate(['/']);
+  }
+
+  private showSuccessToast(message: string): void {
+    this.showToast(message, 'success');
+  }
+
+  private showErrorToast(message: string): void {
+    this.showToast(message, 'error');
+  }
+
+  private showToast(message: string, type: 'success' | 'error'): void {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform ${
+      type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-100');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-full');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   }
 }

@@ -1,11 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatDividerModule } from '@angular/material/divider';
 import { MessageResponse } from '../../../../core/services/message-http.service';
 
 @Component({
@@ -13,14 +8,10 @@ import { MessageResponse } from '../../../../core/services/message-http.service'
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
-    MatCardModule,
-    MatButtonModule,
-    MatIconModule,
-    MatChipsModule,
-    MatDividerModule
+    RouterModule
   ],
   templateUrl: './message-list.component.html',
+
 })
 export class MessageListComponent {
   @Input() messages: MessageResponse[] = [];

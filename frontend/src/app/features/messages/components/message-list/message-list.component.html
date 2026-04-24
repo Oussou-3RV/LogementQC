@@ -1,99 +1,158 @@
-<div *ngIf="messages.length === 0" class="text-center py-8 text-gray-500">
-    <mat-icon class="text-4xl mb-2 !h-10 !w-10">inbox</mat-icon>
+<div *ngIf="messages.length === 0" class="text-center py-12 text-slate-500">
+    <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+    </svg>
     <p>Aucun message</p>
-</div>
-
-<div *ngIf="messages.length > 0" class="space-y-4">
-    <mat-card *ngFor="let message of messages" class="cursor-pointer hover:shadow-lg transition-shadow"
-        [class.bg-blue-50]="type === 'received' && !message.lu">
-
-        <mat-card-content class="p-4">
-            <div class="flex items-start justify-between">
-
-                <!-- Icône et contenu -->
-                <div class="flex items-start space-x-4 flex-1">
-                    <!-- Icône -->
-                    <mat-icon class="text-3xl !h-10 !w-10" [class.text-blue-600]="type === 'received' && !message.lu"
-                        [class.text-gray-400]="type === 'received' && message.lu"
-                        [class.text-green-600]="type === 'sent'">
-                        {{ type === 'received' ? (message.lu ? 'mail' : 'mark_email_unread') : 'send' }}
-                    </mat-icon>
-
-                    <!-- Contenu -->
-                    <div class="flex-1">
-                        <!-- Sujet -->
-                        <h3 class="font-semibold text-lg mb-1"
-                            [class.text-blue-900]="type === 'received' && !message.lu">
-                            {{ message.sujet }}
-                        </h3>
-
-                        <!-- Métadonnées -->
-                        <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                            <span class="flex items-center">
-                                <mat-icon class="text-sm mr-1 !h-4 !w-4">schedule</mat-icon>
-                                {{ getTimeAgo(message.createdAt) }}
-                            </span>
-                            <span class="flex items-center">
-                                <mat-icon class="text-sm mr-1 !h-4 !w-4">article</mat-icon>
-                                Annonce #{{ message.annonceId.substring(0, 8) }}
-                            </span>
-                        </div>
-
-                        <!-- Contenu -->
-                        <p class="text-gray-700 mb-3">
-                            {{ truncateContent(message.contenu) }}
-                        </p>
-
-                        <!-- Chips -->
-                        <div class="flex items-center space-x-2">
-                            <mat-chip *ngIf="type === 'received' && !message.lu"
-                                class="!bg-orange-100 !text-orange-800">
-                                <mat-icon class="!h-4 !w-4">fiber_new</mat-icon>
-                                Non lu
-                            </mat-chip>
-                            <mat-chip *ngIf="type === 'received' && message.lu" class="!bg-gray-100 !text-gray-800">
-                                <mat-icon class="!h-4 !w-4">done</mat-icon>
-                                Lu
-                            </mat-chip>
-                            <mat-chip *ngIf="type === 'sent'" class="!bg-green-100 !text-green-800">
-                                <mat-icon class="!h-4 !w-4">check_circle</mat-icon>
-                                Envoyé
-                            </mat-chip>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actions -->
-                <div class="flex flex-col space-y-2 ml-4">
-                    <!-- Bouton Répondre (seulement pour les messages reçus) -->
-                    <button 
-                      mat-mini-fab 
-                      *ngIf="type === 'received'"
-                      (click)="onReply(message)"
-                      class="!bg-indigo-600 hover:!bg-indigo-700"
-                      matTooltip="Répondre">
-                      <mat-icon class="text-white">reply</mat-icon>
-                    </button>
-                  
-                    <button 
-                      mat-icon-button 
-                      *ngIf="type === 'received' && !message.lu"
-                      (click)="onMarkAsRead(message.id)"
-                      class="text-green-600"
-                      matTooltip="Marquer comme lu">
-                      <mat-icon>done_all</mat-icon>
-                    </button>
-                    
-                    <button 
-                      mat-icon-button
-                      [routerLink]="['/annonces', message.annonceId]"
-                      class="text-blue-600"
-                      matTooltip="Voir l'annonce">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                  </div>
-
+  </div>
+  
+  <div *ngIf="messages.length > 0" class="space-y-4">
+    <div 
+      *ngFor="let message of messages" 
+      class="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"
+      [class.bg-blue-50]="type === 'received' && !message.lu"
+      [class.border-blue-200]="type === 'received' && !message.lu">
+      
+      <div class="flex items-start justify-between gap-4">
+        
+        <!-- Icône et contenu -->
+        <div class="flex items-start gap-4 flex-1">
+          <!-- Icône -->
+          <div class="flex-shrink-0">
+            <div 
+              class="w-12 h-12 rounded-lg flex items-center justify-center"
+              [class.bg-blue-100]="type === 'received' && !message.lu"
+              [class.bg-gray-100]="type === 'received' && message.lu"
+              [class.bg-green-100]="type === 'sent'">
+              <svg 
+                class="w-6 h-6"
+                [class.text-blue-600]="type === 'received' && !message.lu"
+                [class.text-gray-500]="type === 'received' && message.lu"
+                [class.text-green-600]="type === 'sent'"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24">
+                <path 
+                  *ngIf="type === 'received' && !message.lu"
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                </path>
+                <path 
+                  *ngIf="type === 'received' && message.lu"
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76">
+                </path>
+                <path 
+                  *ngIf="type === 'sent'"
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8">
+                </path>
+              </svg>
             </div>
-        </mat-card-content>
-    </mat-card>
-</div>
+          </div>
+  
+          <!-- Contenu -->
+          <div class="flex-1 min-w-0">
+            <!-- Sujet -->
+            <h3 
+              class="font-semibold text-lg mb-2" 
+              [class.text-blue-900]="type === 'received' && !message.lu"
+              [class.text-slate-900]="!(type === 'received' && !message.lu)">
+              {{ message.sujet }}
+            </h3>
+  
+            <!-- Métadonnées -->
+            <div class="flex flex-wrap items-center gap-3 text-sm text-slate-600 mb-3">
+              <span class="flex items-center">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                {{ getTimeAgo(message.createdAt) }}
+              </span>
+              <span class="flex items-center">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Annonce #{{ message.annonceId.substring(0, 8) }}
+              </span>
+            </div>
+  
+            <!-- Contenu -->
+            <p class="text-slate-700 mb-4 leading-relaxed">
+              {{ truncateContent(message.contenu, 150) }}
+            </p>
+  
+            <!-- Badges -->
+            <div class="flex flex-wrap items-center gap-2">
+              <span 
+                *ngIf="type === 'received' && !message.lu" 
+                class="px-3 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full flex items-center">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Non lu
+              </span>
+              <span 
+                *ngIf="type === 'received' && message.lu" 
+                class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-semibold rounded-full flex items-center">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Lu
+              </span>
+              <span 
+                *ngIf="type === 'sent'" 
+                class="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center">
+                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Envoyé
+              </span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Actions -->
+        <div class="flex flex-col gap-2">
+          <!-- Bouton Répondre -->
+          <button 
+            *ngIf="type === 'received'"
+            (click)="onReply(message)"
+            class="p-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            title="Répondre">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+            </svg>
+          </button>
+  
+          <!-- Bouton Marquer comme lu -->
+          <button 
+            *ngIf="type === 'received' && !message.lu"
+            (click)="onMarkAsRead(message.id)"
+            class="p-2.5 border border-gray-300 text-slate-700 rounded-lg hover:bg-gray-50 transition-colors"
+            title="Marquer comme lu">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </button>
+          
+          <!-- Bouton Voir l'annonce -->
+          <button 
+            [routerLink]="['/annonces', message.annonceId]"
+            class="p-2.5 border border-gray-300 text-slate-700 rounded-lg hover:bg-gray-50 transition-colors"
+            title="Voir l'annonce">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+          </button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
