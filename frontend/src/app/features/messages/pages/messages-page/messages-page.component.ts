@@ -26,7 +26,7 @@ export class MessagesPageComponent implements OnInit {
   selectedTab: 'received' | 'sent' | 'unread' = 'received';
   showReplyDialog = false;
   selectedMessage: MessageResponse | null = null;
- 
+
 
   constructor(
     private messageService: MessageService,
@@ -104,7 +104,8 @@ export class MessagesPageComponent implements OnInit {
   }
 
   sendReply(replyData: any): void {
-    if (!this.selectedMessage) return;
+
+    if (!this.selectedMessage) return
 
     const messageData = {
       annonceId: replyData.annonceId,
@@ -140,17 +141,16 @@ export class MessagesPageComponent implements OnInit {
 
   private showToast(message: string, type: 'success' | 'error'): void {
     const toast = document.createElement('div');
-    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform ${
-      type === 'success' ? 'bg-green-600' : 'bg-red-600'
-    }`;
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform ${type === 'success' ? 'bg-green-600' : 'bg-red-600'
+      }`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     setTimeout(() => {
       toast.classList.add('opacity-100');
     }, 10);
-    
+
     setTimeout(() => {
       toast.classList.add('opacity-0', 'translate-x-full');
       setTimeout(() => {

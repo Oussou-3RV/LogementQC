@@ -5,6 +5,7 @@ import { environment } from '../../../environments/environment.development';
 
 export interface CreateMessageRequest {
   annonceId: string;
+  destinataireId: string; 
   sujet: string;
   contenu: string;
 }

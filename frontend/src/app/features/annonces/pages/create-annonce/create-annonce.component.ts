@@ -4,13 +4,15 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AnnonceService } from '../../../../core/services/annonce.service';
+import { ImageUploadComponent } from '../../../../shared/components/image-upload/image-upload.component';
 
 @Component({
   selector: 'app-create-annonce',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ImageUploadComponent
   ],
   templateUrl: './create-annonce.component.html',
   styleUrls: ['./create-annonce.component.scss']
@@ -18,9 +20,8 @@ import { AnnonceService } from '../../../../core/services/annonce.service';
 export class CreateAnnonceComponent implements OnInit {
   basicInfoForm: FormGroup;
   addressForm: FormGroup;
-  photosForm: FormGroup;
   loading = false;
-  photoUrls: string[] = [];
+  uploadedImageUrls: string[] = [];
   currentStep = 1;
 
   constructor(
@@ -51,11 +52,6 @@ export class CreateAnnonceComponent implements OnInit {
       province: ['QC', Validators.required],
       codePostal: ['', [Validators.required, Validators.pattern(/^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i)]],
       pays: ['Canada', Validators.required]
-    });
-
-    // Formulaire 3: Photos
-    this.photosForm = this.fb.group({
-      photoUrl: ['', Validators.pattern(/^https?:\/\/.+/)]
     });
   }
 
@@ -90,34 +86,28 @@ export class CreateAnnonceComponent implements OnInit {
     this.addressForm.patchValue({ codePostal: value }, { emitEvent: false });
   }
 
-  addPhoto(): void {
-    const url = this.photosForm.get('photoUrl')?.value;
-    if (url && url.trim()) {
-      this.photoUrls.push(url.trim());
-      this.photosForm.patchValue({ photoUrl: '' });
-    }
-  }
-
-  removePhoto(index: number): void {
-    this.photoUrls.splice(index, 1);
+  onImagesUploaded(urls: string[]): void {
+    console.log('Images uploaded:', urls);
+    this.uploadedImageUrls = urls;
+    this.showSuccessToast(`${urls.length} image(s) téléchargée(s) avec succès !`);
   }
 
   onSubmit(): void {
     // Vérifier que tous les formulaires sont valides
     if (this.basicInfoForm.valid && this.addressForm.valid) {
+      
+      // Vérifier qu'il y a au moins une photo
+      if (this.uploadedImageUrls.length === 0) {
+        this.showErrorToast('Veuillez télécharger au moins une photo');
+        return;
+      }
+
       this.loading = true;
       const currentUser = this.authService.currentUser();
   
       if (!currentUser) {
         this.showErrorToast('Vous devez être connecté');
         this.router.navigate(['/auth/login']);
-        this.loading = false;
-        return;
-      }
-
-      // Vérifier qu'il y a au moins une photo
-      if (this.photoUrls.length === 0) {
-        this.showErrorToast('Veuillez ajouter au moins une photo');
         this.loading = false;
         return;
       }
@@ -134,7 +124,7 @@ export class CreateAnnonceComponent implements OnInit {
         descriptionLongue: this.basicInfoForm.value.descriptionLongue,
         montantMensuel: parseFloat(this.basicInfoForm.value.montantMensuel),
         dateDisponibilite: formattedDate,
-        photos: this.photoUrls,
+        photos: this.uploadedImageUrls,
         rue: this.addressForm.value.rue,
         ville: this.addressForm.value.ville,
         province: this.addressForm.value.province,

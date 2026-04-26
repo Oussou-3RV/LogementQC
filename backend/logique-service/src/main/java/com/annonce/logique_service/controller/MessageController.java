@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class MessageController {
 
     private final MessageService messageService;
@@ -27,7 +26,7 @@ public class MessageController {
     public ResponseEntity<MessageResponse> createMessage(
             @Valid @RequestBody CreateMessageRequest request,
             Authentication authentication) {
-        log.info("POST /api/messages - Create new message");
+
         String expediteurId = (String) authentication.getCredentials();
         MessageResponse response = messageService.createMessage(request, expediteurId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

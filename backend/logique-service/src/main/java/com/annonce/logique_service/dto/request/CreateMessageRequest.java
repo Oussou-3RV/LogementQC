@@ -1,5 +1,6 @@
 package com.annonce.logique_service.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,10 @@ public class CreateMessageRequest {
 
     @NotBlank(message = "L'ID de l'annonce est obligatoire")
     private String annonceId;
+
+    @NotBlank(message = "L'ID du destinataire est obligatoire")
+    @JsonProperty("destinataireId")
+    private String destinataireId;
 
     @NotBlank(message = "Le sujet est obligatoire")
     @Size(min = 5, max = 200, message = "Le sujet doit contenir entre 5 et 200 caractères")

@@ -74,6 +74,7 @@ export class AnnonceDetailComponent implements OnInit, OnDestroy {
   }
 
   onMessageSent(message: { sujet: string; contenu: string }): void {
+  
     if (!this.annonce) return;
   
     if (!this.isAuthenticated) {
@@ -84,6 +85,7 @@ export class AnnonceDetailComponent implements OnInit, OnDestroy {
   
     this.messageService.sendMessage({
       annonceId: this.annonce.id,
+      destinataireId: this.annonce.userId,
       sujet: message.sujet,
       contenu: message.contenu
     }).subscribe({

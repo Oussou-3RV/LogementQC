@@ -2,13 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
@@ -17,14 +10,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule
+    RouterModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -38,8 +24,7 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private router: Router
   ) {
     // Rediriger si déjà connecté
     if (this.authService.isAuthenticated()) {
@@ -69,13 +54,12 @@ export class LoginComponent {
       this.authService.login(loginData).subscribe({
         next: () => {
           console.log('Login successful');
-          this.snackBar.open('Connexion réussie !', 'Fermer', { duration: 3000 });
+          this.showSuccessToast('Connexion réussie !');
           this.router.navigate(['/home']);
         },
         error: (error) => {
           console.error('Login error:', error);
           this.errorMessage = error.error?.message || 'Email ou mot de passe incorrect';
-          this.snackBar.open(this.errorMessage, 'Fermer', { duration: 5000 });
           this.loading = false;
         },
         complete: () => {
@@ -83,5 +67,24 @@ export class LoginComponent {
         }
       });
     }
+  }
+
+  private showSuccessToast(message: string): void {
+    const toast = document.createElement('div');
+    toast.className = 'fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform bg-green-600';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-100');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-full');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   }
 }

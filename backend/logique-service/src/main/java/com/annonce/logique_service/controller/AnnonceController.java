@@ -19,7 +19,6 @@ import java.util.List;
 @RequestMapping("/api/annonces")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class AnnonceController {
 
     private final AnnonceService annonceService;

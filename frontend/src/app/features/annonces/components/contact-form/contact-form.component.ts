@@ -1,31 +1,22 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-contact-form',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCardModule,
-    MatIconModule
+    ReactiveFormsModule
   ],
   templateUrl: './contact-form.component.html',
   styleUrls: ['./contact-form.component.scss']
 })
 export class ContactFormComponent {
   @Input() annonceId!: string;
+  @Input() utilisateurId!: string;  // (le propriétaire de l'annonce)
   @Input() isAuthenticated = false;
-  @Output() messageSent = new EventEmitter<{ sujet: string; contenu: string }>();
+  @Output() messageSent = new EventEmitter<any>();  //  CHANGE le type
 
   contactForm: FormGroup;
   submitted = false;
@@ -43,12 +34,19 @@ export class ContactFormComponent {
 
   onSubmit(): void {
     this.submitted = true;
-
     if (this.contactForm.invalid) {
       return;
     }
 
-    this.messageSent.emit(this.contactForm.value);
+    // Émettre avec annonceId et destinataireId
+    const messageData = {
+      annonceId: this.annonceId,
+      destinataireId: this.utilisateurId,
+      sujet: this.contactForm.value.sujet,
+      contenu: this.contactForm.value.contenu
+    };
+
+    this.messageSent.emit(messageData);
     this.contactForm.reset();
     this.submitted = false;
   }

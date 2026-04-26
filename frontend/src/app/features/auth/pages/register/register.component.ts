@@ -2,14 +2,6 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatStepperModule } from '@angular/material/stepper';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
@@ -18,15 +10,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatStepperModule,
-    MatProgressSpinnerModule,
-    MatSnackBarModule
+    RouterModule
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
@@ -36,6 +20,7 @@ export class RegisterComponent {
   personalFormGroup: FormGroup;
   addressFormGroup: FormGroup;
   
+  currentStep = 1;
   loading = false;
   hidePassword = true;
   hideConfirmPassword = true;
@@ -43,13 +28,19 @@ export class RegisterComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private router: Router
   ) {
+    console.log('🔵 RegisterComponent - Constructor appelé');
+    
     // Rediriger si déjà connecté
     if (this.authService.isAuthenticated()) {
+      console.log('🔴 Déjà connecté, redirection vers /');
       this.router.navigate(['/']);
     }
+    
+    console.log('🟢 Initialisation des formulaires...');
+
+    
 
     // Étape 1: Compte
     this.accountFormGroup = this.fb.group({
@@ -77,6 +68,11 @@ export class RegisterComponent {
     });
   }
 
+  ngOnInit(): void {
+    console.log('🟢 RegisterComponent - ngOnInit appelé');
+    console.log('🟢 currentStep:', this.currentStep);
+  }
+
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
     const confirmPassword = control.get('confirmPassword')?.value;
@@ -86,6 +82,20 @@ export class RegisterComponent {
     }
     
     return password === confirmPassword ? null : { mismatch: true };
+  }
+
+  nextStep(): void {
+    if (this.currentStep === 1 && this.accountFormGroup.valid) {
+      this.currentStep = 2;
+    } else if (this.currentStep === 2 && this.personalFormGroup.valid) {
+      this.currentStep = 3;
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
   }
 
   formatPhoneNumber(event: Event): void {
@@ -132,13 +142,13 @@ export class RegisterComponent {
       this.authService.register(registerData).subscribe({
         next: () => {
           console.log('Registration successful');
-          this.snackBar.open('Inscription réussie ! Bienvenue !', 'Fermer', { duration: 3000 });
+          this.showSuccessToast('Inscription réussie ! Bienvenue !');
           this.router.navigate(['/home']);
         },
         error: (error) => {
           console.error('Registration error:', error);
           const errorMessage = error.error?.message || 'Une erreur est survenue lors de l\'inscription';
-          this.snackBar.open(errorMessage, 'Fermer', { duration: 5000 });
+          this.showErrorToast(errorMessage);
           this.loading = false;
         },
         complete: () => {
@@ -146,7 +156,36 @@ export class RegisterComponent {
         }
       });
     } else {
-      this.snackBar.open('Veuillez remplir tous les champs correctement', 'Fermer', { duration: 3000 });
+      this.showErrorToast('Veuillez remplir tous les champs correctement');
     }
+  }
+
+  private showSuccessToast(message: string): void {
+    this.showToast(message, 'success');
+  }
+
+  private showErrorToast(message: string): void {
+    this.showToast(message, 'error');
+  }
+
+  private showToast(message: string, type: 'success' | 'error'): void {
+    const toast = document.createElement('div');
+    toast.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-medium transition-all transform ${
+      type === 'success' ? 'bg-green-600' : 'bg-red-600'
+    }`;
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-100');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-x-full');
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
   }
 }

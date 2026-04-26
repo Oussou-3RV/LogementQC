@@ -1,70 +1,82 @@
-<mat-card>
-    <mat-card-header class="bg-blue-500 ">
-      <mat-card-title class="pb-3">
-        <mat-icon class="align-middle mr-2 text-white">mail</mat-icon>
-        <span class="text-gray-200">Contacter l'annonceur</span>
-      </mat-card-title>
-    </mat-card-header>
-  
-    <mat-card-content class="bg-white">
-      <div *ngIf="!isAuthenticated" class="bg-yellow-50 border border-yellow-200 rounded  my-4">
-        <div class="flex items-start">
-          <mat-icon class="text-yellow-600 pr-6">info</mat-icon>
-          <div>
-            <p class="font-semibold text-yellow-800">Connexion requise</p>
-            <p class="text-yellow-700 text-sm">
-              Vous devez être connecté pour contacter l'annonceur.
-              <a href="/auth/login" class="underline font-semibold">Connexion</a> ou
-              <a href="/auth/register" class="underline font-semibold">Inscription</a>
-            </p>
-          </div>
+<div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+  <!-- Header -->
+  <div class="bg-blue-600 px-6 py-4">
+    <h3 class="text-lg font-semibold text-white flex items-center">
+      <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+      </svg>
+      Contacter l'annonceur
+    </h3>
+  </div>
+
+  <!-- Content -->
+  <div class="p-6">
+    
+    <!-- Message non connecté -->
+    <div *ngIf="!isAuthenticated" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+          <p class="font-semibold text-yellow-800 mb-1">Connexion requise</p>
+          <p class="text-sm text-yellow-700">
+            Vous devez être connecté pour contacter l'annonceur.
+            <a routerLink="/auth/login" class="underline font-semibold hover:text-yellow-900">Connexion</a> ou
+            <a routerLink="/auth/register" class="underline font-semibold hover:text-yellow-900">Inscription</a>
+          </p>
         </div>
       </div>
-  
-      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" *ngIf="isAuthenticated" >
-        <!-- Sujet -->
-        <mat-form-field class="w-full pt-3" >
-          <mat-label>Sujet</mat-label>
-          <input 
-            matInput 
-            formControlName="sujet"
-            placeholder="Ex: Intéressé par votre logement"
-          />
-          <mat-error *ngIf="submitted && f['sujet'].errors?.['required']">
-            Le sujet est obligatoire
-          </mat-error>
-          <mat-error *ngIf="submitted && f['sujet'].errors?.['minlength']">
-            Le sujet doit contenir au moins 5 caractères
-          </mat-error>
-        </mat-form-field>
-  
-        <!-- Message -->
-        <mat-form-field class="w-full" >
-          <mat-label>Message</mat-label>
-          <textarea 
-            matInput 
-            formControlName="contenu"
-            rows="6"
-            placeholder="Bonjour, je suis intéressé par votre annonce..."
-          ></textarea>
-          <mat-error *ngIf="submitted && f['contenu'].errors?.['required']">
-            Le message est obligatoire
-          </mat-error>
-          <mat-error *ngIf="submitted && f['contenu'].errors?.['minlength']">
-            Le message doit contenir au moins 20 caractères
-          </mat-error>
-        </mat-form-field>
-  
-        <!-- Bouton -->
-        <button 
-          mat-raised-button 
-          color="primary" 
-          type="submit"
-          class="w-full"
-        >
-          <mat-icon>send</mat-icon>
-          Envoyer le message
-        </button>
-      </form>
-    </mat-card-content>
-  </mat-card>
+    </div>
+
+    <!-- Formulaire -->
+    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" *ngIf="isAuthenticated" class="space-y-4">
+      
+      <!-- Sujet -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">
+          Sujet <span class="text-red-500">*</span>
+        </label>
+        <input 
+          type="text"
+          formControlName="sujet"
+          placeholder="Ex: Intéressé par votre logement"
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+          [class.border-red-500]="submitted && f['sujet'].invalid">
+        <p *ngIf="submitted && f['sujet'].invalid" class="mt-1 text-sm text-red-600">
+          <span *ngIf="f['sujet'].errors?.['required']">Le sujet est obligatoire</span>
+          <span *ngIf="f['sujet'].errors?.['minlength']">Le sujet doit contenir au moins 5 caractères</span>
+        </p>
+      </div>
+
+      <!-- Message -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-2">
+          Message <span class="text-red-500">*</span>
+        </label>
+        <textarea 
+          formControlName="contenu"
+          rows="6"
+          placeholder="Bonjour, je suis intéressé par votre annonce..."
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+          [class.border-red-500]="submitted && f['contenu'].invalid">
+        </textarea>
+        <p *ngIf="submitted && f['contenu'].invalid" class="mt-1 text-sm text-red-600">
+          <span *ngIf="f['contenu'].errors?.['required']">Le message est obligatoire</span>
+          <span *ngIf="f['contenu'].errors?.['minlength']">Le message doit contenir au moins 20 caractères</span>
+        </p>
+      </div>
+
+      <!-- Bouton -->
+      <button 
+        type="submit"
+        class="w-full px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+        Envoyer le message
+      </button>
+    </form>
+
+  </div>
+</div>

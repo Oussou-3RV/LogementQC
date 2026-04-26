@@ -36,14 +36,14 @@ public class MessageService {
         String destinataireId = annonce.getUserId();
 
         // Vérifier que l'expéditeur n'est pas le destinataire
-        if (expediteurId.equals(destinataireId)) {
-            throw new IllegalArgumentException("Vous ne pouvez pas vous envoyer un message à vous-même");
-        }
+//        if (expediteurId.equals(destinataireId)) {
+//            throw new IllegalArgumentException("Vous ne pouvez pas vous envoyer un message à vous-même");
+//        }
 
         Message message = Message.builder()
                 .annonceId(request.getAnnonceId())
                 .expediteurId(expediteurId)
-                .destinataireId(destinataireId)
+                .destinataireId(request.getDestinataireId())
                 .sujet(request.getSujet())
                 .contenu(request.getContenu())
                 .lu(false)

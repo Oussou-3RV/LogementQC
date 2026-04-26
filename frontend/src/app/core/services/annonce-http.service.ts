@@ -4,19 +4,16 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 
 export interface CreateAnnonceRequest {
-  titre: string;
   descriptionCourte: string;
   descriptionLongue: string;
   montantMensuel: number;
   dateDisponibilite: string;
-  photos: string[];
   rue: string;
   ville: string;
   province: string;
   codePostal: string;
   pays: string;
-  latitude?: number;
-  longitude?: number;
+  photos: string[];
 }
 
 export interface AnnonceResponse {

@@ -42,8 +42,10 @@ export class ReplyMessageDialogComponent implements OnInit {
 
   onSend(): void {
     if (this.replyForm.valid) {
+      
       this.send.emit({
         annonceId: this.originalMessage.annonceId,
+        destinataireId: this.originalMessage.expediteurId,
         sujet: this.replyForm.value.sujet,
         contenu: this.replyForm.value.contenu
       });

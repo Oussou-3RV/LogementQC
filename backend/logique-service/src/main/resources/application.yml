@@ -1,0 +1,18 @@
+file:
+  upload-dir: uploads
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 25MB
+      location: ${java.io.tmpdir}
+
+logging:
+  level:
+    root: INFO
+    com.annonce.logique_service: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

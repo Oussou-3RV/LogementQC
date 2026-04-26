@@ -27,8 +27,6 @@ export class NavbarComponent {
       this.isAuthenticated = this.authService.isAuthenticated();
       this.currentUser = user;
       
-      console.log('🔄 Navbar updated - User:', user ? user.email : 'none');
-      
       if (user) {
         this.loadUnreadCount();
       } else {
@@ -41,7 +39,7 @@ export class NavbarComponent {
     this.messageService.loadUnreadMessages().subscribe({
       next: () => {
         this.unreadCount = this.messageService.unreadMessages().length;
-        console.log('📧 Messages non lus:', this.unreadCount);
+        console.log('Messages non lus:', this.unreadCount);
       },
       error: (err) => {
         console.error('Erreur chargement messages non lus:', err);
