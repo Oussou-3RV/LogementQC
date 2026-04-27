@@ -1,9 +1,36 @@
+# Secrets
+.env
+*.env
+**/.env
+application-local.yml
+**/application-local.yml
+
+# Backend
+backend/**/target/
+backend/**/*.jar
+backend/**/*.log
+backend/**/uploads/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.env
+node_modules/
+
 # IDE
 .idea/
 *.iml
 *.iws
 *.ipr
-
-# Backend IDE files
 backend/**/.idea/
 backend/**/*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
