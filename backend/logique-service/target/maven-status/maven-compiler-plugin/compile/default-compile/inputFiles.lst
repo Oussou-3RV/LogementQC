@@ -1,4 +1,12 @@
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/LogiqueServiceApplication.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/config/JacksonConfig.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/config/JwtProperties.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/config/SecurityConfig.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/config/WebConfig.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/controller/AnnonceController.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/controller/FileUploadController.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/controller/MessageController.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/controller/TestController.java
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/dto/request/CreateAnnonceRequest.java
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/dto/request/CreateMessageRequest.java
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/dto/request/UpdateAnnonceRequest.java
@@ -8,5 +16,12 @@
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/dto/response/MessageResponse.java
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/entity/Annonce.java
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/entity/Message.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/exception/GlobalExceptionHandler.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/exception/ResourceNotFoundException.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/exception/UnauthorizedAccessException.java
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/repository/AnnonceRepository.java
 /Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/repository/MessageRepository.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/security/JwtAuthenticationFilter.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/security/JwtUtils.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/service/AnnonceService.java
+/Users/baldeousmane/Desktop/UQTR/hiver-26/inf1013/app-annnonces-tp/backend/logique-service/src/main/java/com/annonce/logique_service/service/MessageService.java
