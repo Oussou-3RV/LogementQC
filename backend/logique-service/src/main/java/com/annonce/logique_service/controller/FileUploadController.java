@@ -1,5 +1,6 @@
 package com.annonce.logique_service.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +18,14 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/uploads")
-@CrossOrigin(origins = "http://localhost:4200")
 public class FileUploadController {
 
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
 
     @PostMapping("/images")
-    public ResponseEntity<?> uploadImages(@RequestParam("files") MultipartFile[] files) {
+    public ResponseEntity<?> uploadImages(@RequestParam("files") MultipartFile[] files,
+                                          HttpServletRequest request) {  // ← AJOUTE
         try {
             // Créer le dossier uploads s'il n'existe pas
             Path uploadPath = Paths.get(uploadDir);
@@ -33,6 +34,13 @@ public class FileUploadController {
             }
 
             List<String> imageUrls = new ArrayList<>();
+
+            // Construire l'URL de base dynamiquement
+            String baseUrl = request.getScheme() + "://" +
+                    request.getServerName() +
+                    (request.getServerPort() != 80 && request.getServerPort() != 443
+                            ? ":" + request.getServerPort()
+                            : "");
 
             for (MultipartFile file : files) {
                 // Validation
@@ -64,8 +72,8 @@ public class FileUploadController {
                 Path filePath = uploadPath.resolve(filename);
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-                // Ajouter l'URL à la liste
-                String imageUrl = "http://localhost:8082/api/uploads/images/" + filename;
+                // Ajouter l'URL à la liste avec URL dynamique
+                String imageUrl = baseUrl + "/api/uploads/images/" + filename;  // ← CHANGE
                 imageUrls.add(imageUrl);
             }
 
